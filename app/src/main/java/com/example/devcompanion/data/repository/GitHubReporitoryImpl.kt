@@ -3,6 +3,7 @@ package com.example.devcompanion.data.repository
 import com.example.devcompanion.data.mapper.toDomain
 import com.example.devcompanion.data.remote.api.GitHubApiService
 import com.example.devcompanion.domain.model.GitHubRepository
+import com.example.devcompanion.domain.model.GitHubRepositoryDetails
 import com.example.devcompanion.domain.repository.GitHubRepositoryDataSource
 import javax.inject.Inject
 
@@ -16,5 +17,13 @@ class GitHubRepositoryImpl @Inject constructor(
         return apiService.searchRepositories(query)
             .items
             .map { it.toDomain() }
+    }
+
+    override suspend fun getRepositoryDetails(
+        owner: String,
+        repo: String
+    ): GitHubRepositoryDetails {
+        return apiService.getRepositoryDetails(owner, repo)
+            .toDomain()
     }
 }

@@ -33,6 +33,7 @@ import com.example.devcompanion.domain.model.GitHubRepository
 
 @Composable
 fun GitHubScreen(
+    onRepositoryClick: (owner: String, repo: String) -> Unit,
     viewModel: GitHubViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -108,11 +109,11 @@ fun GitHubScreen(
                 RepositoryCard(
                     repository = repository,
                     onClick = {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse(repository.htmlUrl)
-                        )
-                        context.startActivity(intent)
+                        val parts = repository.fullName.split("/", limit = 2)
+
+                        if (parts.size == 2) {
+                            onRepositoryClick(parts[0], parts[1])
+                        }
                     }
                 )
             }

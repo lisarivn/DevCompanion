@@ -1,26 +1,37 @@
 package com.example.devcompanion.core.navigation
 
+import android.net.Uri
+
 sealed class AppDestination(
     val route: String,
     val title: String
 ) {
-    data object Dashboard : AppDestination(
-        route = "dashboard",
-        title = "Dashboard"
+    data object Dashboard : AppDestination("dashboard", "Dashboard")
+    data object GitHub : AppDestination("github", "GitHub")
+    data object DevTools : AppDestination("devtools", "DevTools")
+    data object Workspace : AppDestination("workspace", "Workspace")
+
+    data object RepositoryDetails : AppDestination(
+        "repository/{owner}/{repo}",
+        "Repository"
+    ) {
+        fun createRoute(owner: String, repo: String): String {
+            return "repository/${Uri.encode(owner)}/${Uri.encode(repo)}"
+        }
+    }
+
+    data object Issues : AppDestination(
+        "repository/{owner}/{repo}/issues",
+        "Issues"
     )
 
-    data object GitHub : AppDestination(
-        route = "github",
-        title = "GitHub"
+    data object PullRequests : AppDestination(
+        "repository/{owner}/{repo}/pulls",
+        "Pull Requests"
     )
 
-    data object DevTools : AppDestination(
-        route = "devtools",
-        title = "DevTools"
-    )
-
-    data object Workspace : AppDestination(
-        route = "workspace",
-        title = "Workspace"
+    data object Commits : AppDestination(
+        "repository/{owner}/{repo}/commits",
+        "Commits"
     )
 }
