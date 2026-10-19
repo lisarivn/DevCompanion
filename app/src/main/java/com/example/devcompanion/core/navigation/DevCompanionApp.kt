@@ -32,6 +32,9 @@ import com.example.devcompanion.feature.devtools.DevToolsScreen
 import com.example.devcompanion.feature.repositories.GitHubScreen
 import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
 import com.example.devcompanion.feature.workspace.WorkspaceScreen
+import com.example.devcompanion.feature.repositories.IssuesScreen
+import com.example.devcompanion.feature.repositories.PullRequestsScreen
+import com.example.devcompanion.feature.repositories.CommitsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -207,48 +210,27 @@ fun DevCompanionApp() {
             }
 
             // Issues
-            composable(
-                route = AppDestination.Issues.route,
-                arguments = listOf(
-                    navArgument("owner") {
-                        type = NavType.StringType
-                    },
-                    navArgument("repo") {
-                        type = NavType.StringType
-                    }
-                )
-            ) {
-                Text("Issues screen")
+            composable(AppDestination.Issues.route) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+
+                IssuesScreen(owner = owner, repo = repo)
             }
 
             // Pull Requests
-            composable(
-                route = AppDestination.PullRequests.route,
-                arguments = listOf(
-                    navArgument("owner") {
-                        type = NavType.StringType
-                    },
-                    navArgument("repo") {
-                        type = NavType.StringType
-                    }
-                )
-            ) {
-                Text("Pull Requests screen")
+            composable(AppDestination.PullRequests.route) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+
+                PullRequestsScreen(owner = owner, repo = repo)
             }
 
             // Commits
-            composable(
-                route = AppDestination.Commits.route,
-                arguments = listOf(
-                    navArgument("owner") {
-                        type = NavType.StringType
-                    },
-                    navArgument("repo") {
-                        type = NavType.StringType
-                    }
-                )
-            ) {
-                Text("Commits screen")
+            composable(AppDestination.Commits.route) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+
+                CommitsScreen(owner = owner, repo = repo)
             }
 
             // DevTools

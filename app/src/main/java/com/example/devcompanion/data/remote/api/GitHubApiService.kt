@@ -6,6 +6,10 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+import com.example.devcompanion.data.remote.dto.GitHubIssueDto
+import com.example.devcompanion.data.remote.dto.GitHubPullRequestDto
+import com.example.devcompanion.data.remote.dto.GitHubCommitDto
+
 interface GitHubApiService {
 
     @GET("search/repositories")
@@ -20,4 +24,27 @@ interface GitHubApiService {
         @Path("owner") owner: String,
         @Path("repo") repo: String
     ): GitHubRepositoryDetailsDto
+
+    @GET("repos/{owner}/{repo}/issues")
+    suspend fun getIssues(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("state") state: String = "all",
+        @Query("per_page") perPage: Int = 30
+    ): List<GitHubIssueDto>
+
+    @GET("repos/{owner}/{repo}/pulls")
+    suspend fun getPullRequests(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("state") state: String = "all",
+        @Query("per_page") perPage: Int = 30
+    ): List<GitHubPullRequestDto>
+
+    @GET("repos/{owner}/{repo}/commits")
+    suspend fun getCommits(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("per_page") perPage: Int = 30
+    ): List<GitHubCommitDto>
 }
