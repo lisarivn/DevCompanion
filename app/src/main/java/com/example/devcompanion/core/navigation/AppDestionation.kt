@@ -42,4 +42,9 @@ sealed class AppDestination(
         route = "devtools/json",
         title = "JSON Formatter"
     )
+
+    data object UuidGenerator : AppDestination(
+        route = "devtools/uuid",
+        title = "UUID Generator"
+    )
 }

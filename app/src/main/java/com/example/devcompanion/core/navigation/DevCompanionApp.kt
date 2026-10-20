@@ -38,6 +38,7 @@ import com.example.devcompanion.feature.repositories.PullRequestsScreen
 import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
 import com.example.devcompanion.feature.workspace.WorkspaceScreen
 import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
+import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +69,7 @@ fun DevCompanionApp() {
         AppDestination.Issues.route -> "Issues"
         AppDestination.PullRequests.route -> "Pull Requests"
         AppDestination.Commits.route -> "Commits"
+        AppDestination.UuidGenerator.route -> "UUID Generator"
         else -> "DevCompanion"
     }
 
@@ -260,6 +262,9 @@ fun DevCompanionApp() {
                                     AppDestination.JsonFormatter.route
                                 )
                             }
+                            "uuid" -> navController.navigate(
+                                AppDestination.UuidGenerator.route
+                            )
                         }
                     }
                 )
@@ -267,6 +272,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.JsonFormatter.route) {
                 JsonFormatterScreen()
+            }
+
+            composable(AppDestination.UuidGenerator.route) {
+                UuidGeneratorScreen()
             }
 
             // Workspace
