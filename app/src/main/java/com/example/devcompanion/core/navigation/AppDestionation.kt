@@ -37,4 +37,9 @@ sealed class AppDestination(
         "repository/{owner}/{repo}/commits",
         "Commits"
     )
+
+    data object JsonFormatter : AppDestination(
+        route = "devtools/json",
+        title = "JSON Formatter"
+    )
 }

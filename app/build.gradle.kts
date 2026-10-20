@@ -41,6 +41,7 @@ android {
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
+    implementation("com.google.code.gson:gson:2.13.2")
     implementation(composeBom)
     androidTestImplementation(composeBom)
 

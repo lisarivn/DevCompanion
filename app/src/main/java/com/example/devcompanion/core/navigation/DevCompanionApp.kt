@@ -37,6 +37,7 @@ import com.example.devcompanion.feature.repositories.IssuesScreen
 import com.example.devcompanion.feature.repositories.PullRequestsScreen
 import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
 import com.example.devcompanion.feature.workspace.WorkspaceScreen
+import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +63,7 @@ fun DevCompanionApp() {
     // Заголовки вкладених екранів
     val screenTitle = when (currentRoute) {
         AppDestination.Favorites.route -> "Favorites"
+        AppDestination.JsonFormatter.route -> "JSON Formatter"
         AppDestination.RepositoryDetails.route -> "Repository Details"
         AppDestination.Issues.route -> "Issues"
         AppDestination.PullRequests.route -> "Pull Requests"
@@ -250,7 +252,21 @@ fun DevCompanionApp() {
 
             // DevTools
             composable(AppDestination.DevTools.route) {
-                DevToolsScreen()
+                DevToolsScreen(
+                    onToolClick = { toolId ->
+                        when (toolId) {
+                            "json" -> {
+                                navController.navigate(
+                                    AppDestination.JsonFormatter.route
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+
+            composable(AppDestination.JsonFormatter.route) {
+                JsonFormatterScreen()
             }
 
             // Workspace
