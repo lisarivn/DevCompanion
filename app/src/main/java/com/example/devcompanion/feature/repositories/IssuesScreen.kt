@@ -16,18 +16,20 @@ fun IssuesScreen(
     val state by viewModel.issues.collectAsState()
 
     LaunchedEffect(owner, repo) {
-        viewModel.loadIssues(owner, repo)
+        viewModel.initializeIssues(owner, repo)
     }
 
     RepositoryActivityScreen(
         state = state,
         onRetry = { viewModel.loadIssues(owner, repo) },
+        onLoadMore = { viewModel.loadIssues(owner, repo) },
         itemKey = { it.id }
     ) { issue ->
         Text("#${issue.number} ${issue.title}")
         Text("State: ${issue.state}")
         Text("Author: ${issue.author}")
         Text("Created: ${issue.createdAt}")
+
         if (issue.labels.isNotEmpty()) {
             Text("Labels: ${issue.labels.joinToString()}")
         }

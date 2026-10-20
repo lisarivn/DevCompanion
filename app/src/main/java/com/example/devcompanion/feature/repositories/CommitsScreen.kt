@@ -16,12 +16,13 @@ fun CommitsScreen(
     val state by viewModel.commits.collectAsState()
 
     LaunchedEffect(owner, repo) {
-        viewModel.loadCommits(owner, repo)
+        viewModel.initializeCommits(owner, repo)
     }
 
     RepositoryActivityScreen(
         state = state,
         onRetry = { viewModel.loadCommits(owner, repo) },
+        onLoadMore = { viewModel.loadCommits(owner, repo) },
         itemKey = { it.sha }
     ) { commit ->
         Text(commit.message.lineSequence().firstOrNull().orEmpty())

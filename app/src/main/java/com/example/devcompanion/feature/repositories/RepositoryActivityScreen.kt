@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 fun <T> RepositoryActivityScreen(
     state: ActivityUiState<T>,
     onRetry: () -> Unit,
+    onLoadMore: () -> Unit,
     itemKey: (T) -> Any,
     itemContent: @Composable (T) -> Unit
 ) {
@@ -36,7 +37,7 @@ fun <T> RepositoryActivityScreen(
             }
         }
 
-        state.error != null -> {
+        state.error != null && state.items.isEmpty() -> {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -55,7 +56,7 @@ fun <T> RepositoryActivityScreen(
             }
         }
 
-        state.items.isEmpty() -> {
+        state.items.isEmpty() && state.nextPage == null -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -74,13 +75,36 @@ fun <T> RepositoryActivityScreen(
                     items = state.items,
                     key = itemKey
                 ) { item ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp)
-                        ) {
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(16.dp)) {
                             itemContent(item)
+                        }
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (state.error != null) {
+                            Text(
+                                text = state.error,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+
+                        if (state.isLoadingMore) {
+                            CircularProgressIndicator()
+                        } else if (state.nextPage != null) {
+                            Button(
+                                onClick = onLoadMore
+                            ) {
+                                Text(
+                                    if (state.error != null) "Retry"
+                                    else "Load more"
+                                )
+                            }
                         }
                     }
                 }

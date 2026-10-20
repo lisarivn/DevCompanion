@@ -1,7 +1,5 @@
 package com.example.devcompanion.feature.repositories
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,7 +34,6 @@ fun GitHubScreen(
     viewModel: GitHubViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -45,6 +41,7 @@ fun GitHubScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+
         Text(
             text = "GitHub Explorer",
             style = MaterialTheme.typography.headlineMedium
@@ -54,13 +51,17 @@ fun GitHubScreen(
             value = uiState.query,
             onValueChange = viewModel::updateQuery,
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Search repositories") },
+            label = {
+                Text("Search repositories")
+            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Search
             ),
             keyboardActions = KeyboardActions(
-                onSearch = { viewModel.searchRepositories() }
+                onSearch = {
+                    viewModel.searchRepositories()
+                }
             )
         )
 
@@ -92,7 +93,8 @@ fun GitHubScreen(
             uiState.hasSearched &&
             !uiState.isLoading &&
             uiState.error == null &&
-            uiState.repositories.isEmpty()
+            uiState.repositories.isEmpty() &&
+            uiState.nextPage == null
         ) {
             Text("No repositories found.")
         }
@@ -102,20 +104,62 @@ fun GitHubScreen(
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+
             items(
                 items = uiState.repositories,
                 key = { it.id }
             ) { repository ->
+
                 RepositoryCard(
                     repository = repository,
                     onClick = {
-                        val parts = repository.fullName.split("/", limit = 2)
+                        val parts = repository.fullName.split(
+                            "/",
+                            limit = 2
+                        )
 
                         if (parts.size == 2) {
-                            onRepositoryClick(parts[0], parts[1])
+                            onRepositoryClick(
+                                parts[0],
+                                parts[1]
+                            )
                         }
                     }
                 )
+            }
+
+            if (
+                uiState.hasSearched &&
+                uiState.nextPage != null &&
+                !uiState.isLoading
+            ) {
+                item(key = "load_more") {
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        if (uiState.isLoadingMore) {
+                            CircularProgressIndicator()
+                        } else {
+                            Button(
+                                onClick = viewModel::loadMoreRepositories,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    if (uiState.error != null) {
+                                        "Retry loading"
+                                    } else {
+                                        "Load more"
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -135,6 +179,7 @@ private fun RepositoryCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+
             Text(
                 text = repository.fullName,
                 style = MaterialTheme.typography.titleMedium

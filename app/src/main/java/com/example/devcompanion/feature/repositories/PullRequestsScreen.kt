@@ -16,20 +16,19 @@ fun PullRequestsScreen(
     val state by viewModel.pullRequests.collectAsState()
 
     LaunchedEffect(owner, repo) {
-        viewModel.loadPullRequests(owner, repo)
+        viewModel.initializePullRequests(owner, repo)
     }
 
     RepositoryActivityScreen(
         state = state,
         onRetry = { viewModel.loadPullRequests(owner, repo) },
+        onLoadMore = { viewModel.loadPullRequests(owner, repo) },
         itemKey = { it.id }
     ) { pull ->
         Text("#${pull.number} ${pull.title}")
         Text(
-            when {
-                pull.isMerged -> "State: Merged"
-                else -> "State: ${pull.state}"
-            }
+            if (pull.isMerged) "State: Merged"
+            else "State: ${pull.state}"
         )
         Text("Author: ${pull.author}")
         Text("${pull.headBranch} → ${pull.baseBranch}")
