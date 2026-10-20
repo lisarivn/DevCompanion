@@ -1,3 +1,4 @@
+
 package com.example.devcompanion.core.navigation
 
 import android.net.Uri
@@ -29,12 +30,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.devcompanion.feature.dashboard.DashboardScreen
 import com.example.devcompanion.feature.devtools.DevToolsScreen
+import com.example.devcompanion.feature.favorites.FavoritesScreen
+import com.example.devcompanion.feature.repositories.CommitsScreen
 import com.example.devcompanion.feature.repositories.GitHubScreen
-import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
-import com.example.devcompanion.feature.workspace.WorkspaceScreen
 import com.example.devcompanion.feature.repositories.IssuesScreen
 import com.example.devcompanion.feature.repositories.PullRequestsScreen
-import com.example.devcompanion.feature.repositories.CommitsScreen
+import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
+import com.example.devcompanion.feature.workspace.WorkspaceScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,13 +55,13 @@ fun DevCompanionApp() {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
 
-    // Визначаємо, чи перебуваємо на головному екрані
     val isMainScreen = mainDestinations.any {
         it.route == currentRoute
     }
 
-    // Назва для верхньої панелі вкладеного екрана
+    // Заголовки вкладених екранів
     val screenTitle = when (currentRoute) {
+        AppDestination.Favorites.route -> "Favorites"
         AppDestination.RepositoryDetails.route -> "Repository Details"
         AppDestination.Issues.route -> "Issues"
         AppDestination.PullRequests.route -> "Pull Requests"
@@ -70,7 +72,6 @@ fun DevCompanionApp() {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
 
-        // Верхня панель лише для вкладених екранів
         topBar = {
             if (!isMainScreen) {
                 TopAppBar(
@@ -93,12 +94,10 @@ fun DevCompanionApp() {
             }
         },
 
-        // Нижня панель лише для головних вкладок
         bottomBar = {
             if (isMainScreen) {
                 NavigationBar {
                     mainDestinations.forEach { destination ->
-
                         val icon = when (destination) {
                             AppDestination.Dashboard -> Icons.Default.Home
                             AppDestination.GitHub -> Icons.Default.List
@@ -118,7 +117,6 @@ fun DevCompanionApp() {
                                     ) {
                                         saveState = true
                                     }
-
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -155,6 +153,23 @@ fun DevCompanionApp() {
             // GitHub Explorer
             composable(AppDestination.GitHub.route) {
                 GitHubScreen(
+                    onRepositoryClick = { owner, repo ->
+                        navController.navigate(
+                            AppDestination.RepositoryDetails
+                                .createRoute(owner, repo)
+                        )
+                    },
+                    onFavoritesClick = {
+                        navController.navigate(
+                            AppDestination.Favorites.route
+                        )
+                    }
+                )
+            }
+
+            // Favorites
+            composable(AppDestination.Favorites.route) {
+                FavoritesScreen(
                     onRepositoryClick = { owner, repo ->
                         navController.navigate(
                             AppDestination.RepositoryDetails

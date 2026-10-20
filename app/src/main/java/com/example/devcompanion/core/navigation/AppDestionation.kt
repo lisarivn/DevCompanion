@@ -1,3 +1,4 @@
+
 package com.example.devcompanion.core.navigation
 
 import android.net.Uri
@@ -6,8 +7,10 @@ sealed class AppDestination(
     val route: String,
     val title: String
 ) {
+
     data object Dashboard : AppDestination("dashboard", "Dashboard")
     data object GitHub : AppDestination("github", "GitHub")
+    data object Favorites : AppDestination("favorites", "Favorites")
     data object DevTools : AppDestination("devtools", "DevTools")
     data object Workspace : AppDestination("workspace", "Workspace")
 

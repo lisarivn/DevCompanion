@@ -1,3 +1,4 @@
+
 package com.example.devcompanion.feature.repositories
 
 import androidx.compose.foundation.clickable
@@ -12,28 +13,47 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.devcompanion.data.mapper.toFavoriteRepository
 import com.example.devcompanion.domain.model.GitHubRepository
+import com.example.devcompanion.feature.favorites.FavoritesViewModel
+import androidx.compose.material3.OutlinedButton
 
 @Composable
 fun GitHubScreen(
     onRepositoryClick: (owner: String, repo: String) -> Unit,
-    viewModel: GitHubViewModel = hiltViewModel()
+    onFavoritesClick: () -> Unit,
+    viewModel: GitHubViewModel = hiltViewModel(),
+    favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Room автоматично оновлює список після додавання або видалення.
+    val favorites by favoritesViewModel.favorites.collectAsState()
+
+    // Використовуємо Set для швидкої перевірки ID.
+    val favoriteIds = remember(favorites) {
+        favorites.map { it.id }.toSet()
+    }
 
     Column(
         modifier = Modifier
@@ -41,11 +61,25 @@ fun GitHubScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
         Text(
             text = "GitHub Explorer",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        OutlinedButton(
+            onClick = onFavoritesClick,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Star,
+                contentDescription = null
+            )
+
+            Text(
+                text = "Favorites",
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
 
         OutlinedTextField(
             value = uiState.query,
@@ -104,14 +138,19 @@ fun GitHubScreen(
             contentPadding = PaddingValues(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
             items(
                 items = uiState.repositories,
                 key = { it.id }
             ) { repository ->
-
                 RepositoryCard(
                     repository = repository,
+                    isFavorite = repository.id in favoriteIds,
+                    onFavoriteClick = {
+                        favoritesViewModel.toggleFavorite(
+                            repository = repository.toFavoriteRepository(),
+                            isCurrentlyFavorite = repository.id in favoriteIds
+                        )
+                    },
                     onClick = {
                         val parts = repository.fullName.split(
                             "/",
@@ -134,14 +173,12 @@ fun GitHubScreen(
                 !uiState.isLoading
             ) {
                 item(key = "load_more") {
-
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
                         if (uiState.isLoadingMore) {
                             CircularProgressIndicator()
                         } else {
@@ -168,22 +205,51 @@ fun GitHubScreen(
 @Composable
 private fun RepositoryCard(
     repository: GitHubRepository,
+    isFavorite: Boolean,
+    onFavoriteClick: () -> Unit,
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = repository.fullName,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
 
-            Text(
-                text = repository.fullName,
-                style = MaterialTheme.typography.titleMedium
-            )
+                IconButton(
+                    onClick = onFavoriteClick
+                ) {
+                    Icon(
+                        imageVector = if (isFavorite) {
+                            Icons.Filled.Star
+                        } else {
+                            Icons.Outlined.StarBorder
+                        },
+                        contentDescription = if (isFavorite) {
+                            "Remove from Favorites"
+                        } else {
+                            "Add to Favorites"
+                        },
+                        tint = if (isFavorite) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+                }
+            }
 
             repository.description?.let {
                 Text(
