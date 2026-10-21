@@ -57,4 +57,9 @@ sealed class AppDestination(
         route = "devtools/timestamp",
         title = "Timestamp Converter"
     )
+
+    data object HashGenerator : AppDestination(
+        route = "devtools/hash",
+        title = "Hash Generator"
+    )
 }

@@ -40,6 +40,7 @@ import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
 import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
 import com.example.devcompanion.feature.devtools.urlcodec.UrlCodecScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
+import com.example.devcompanion.feature.devtools.hash.HashGeneratorScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +74,7 @@ fun DevCompanionApp() {
         AppDestination.UuidGenerator.route -> "UUID Generator"
         AppDestination.UrlCodec.route -> "URL Encoder / Decoder"
         AppDestination.Timestamp.route -> "Timestamp Converter"
+        AppDestination.HashGenerator.route -> "Hash Generator"
         else -> "DevCompanion"
     }
 
@@ -276,6 +278,10 @@ fun DevCompanionApp() {
                             "timestamp" -> navController.navigate(
                                 AppDestination.Timestamp.route
                             )
+
+                            "hash" -> navController.navigate(
+                                AppDestination.HashGenerator.route
+                            )
                         }
                     }
                 )
@@ -295,6 +301,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.Timestamp.route) {
                 TimestampConverterScreen()
+            }
+
+            composable(AppDestination.HashGenerator.route) {
+                HashGeneratorScreen()
             }
 
             // Workspace
