@@ -62,4 +62,9 @@ sealed class AppDestination(
         route = "devtools/hash",
         title = "Hash Generator"
     )
+
+    data object RegexChecker: AppDestination(
+        route = "devtools/regex",
+        title = "Regex Checker"
+    )
 }

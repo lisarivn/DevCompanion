@@ -41,6 +41,7 @@ import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
 import com.example.devcompanion.feature.devtools.urlcodec.UrlCodecScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
 import com.example.devcompanion.feature.devtools.hash.HashGeneratorScreen
+import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +76,7 @@ fun DevCompanionApp() {
         AppDestination.UrlCodec.route -> "URL Encoder / Decoder"
         AppDestination.Timestamp.route -> "Timestamp Converter"
         AppDestination.HashGenerator.route -> "Hash Generator"
+        AppDestination.RegexChecker.route -> "Regex Checker"
         else -> "DevCompanion"
     }
 
@@ -282,6 +284,10 @@ fun DevCompanionApp() {
                             "hash" -> navController.navigate(
                                 AppDestination.HashGenerator.route
                             )
+
+                            "regex" -> navController.navigate(
+                                AppDestination.RegexChecker.route
+                            )
                         }
                     }
                 )
@@ -305,6 +311,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.HashGenerator.route) {
                 HashGeneratorScreen()
+            }
+
+            composable(AppDestination.RegexChecker.route) {
+                RegexCheckerScreen()
             }
 
             // Workspace
