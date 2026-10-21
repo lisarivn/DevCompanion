@@ -52,4 +52,9 @@ sealed class AppDestination(
         route = "devtools/url",
         title = "URL Encoder / Decoder"
     )
+
+    data object Timestamp : AppDestination(
+        route = "devtools/timestamp",
+        title = "Timestamp Converter"
+    )
 }
