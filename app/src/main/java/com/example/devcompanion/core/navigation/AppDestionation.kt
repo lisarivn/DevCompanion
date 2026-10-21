@@ -47,4 +47,9 @@ sealed class AppDestination(
         route = "devtools/uuid",
         title = "UUID Generator"
     )
+
+    data object UrlCodec : AppDestination(
+        route = "devtools/url",
+        title = "URL Encoder / Decoder"
+    )
 }

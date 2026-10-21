@@ -1,4 +1,3 @@
-
 package com.example.devcompanion.core.navigation
 
 import android.net.Uri
@@ -39,6 +38,7 @@ import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
 import com.example.devcompanion.feature.workspace.WorkspaceScreen
 import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
 import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
+import com.example.devcompanion.feature.devtools.urlcodec.UrlCodecScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,6 +70,7 @@ fun DevCompanionApp() {
         AppDestination.PullRequests.route -> "Pull Requests"
         AppDestination.Commits.route -> "Commits"
         AppDestination.UuidGenerator.route -> "UUID Generator"
+        AppDestination.UrlCodec.route -> "URL Encoder / Decoder"
         else -> "DevCompanion"
     }
 
@@ -265,6 +266,10 @@ fun DevCompanionApp() {
                             "uuid" -> navController.navigate(
                                 AppDestination.UuidGenerator.route
                             )
+
+                            "urlcodec" -> navController.navigate(
+                                AppDestination.UrlCodec.route
+                            )
                         }
                     }
                 )
@@ -276,6 +281,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.UuidGenerator.route) {
                 UuidGeneratorScreen()
+            }
+
+            composable(AppDestination.UrlCodec.route) {
+                UrlCodecScreen()
             }
 
             // Workspace
