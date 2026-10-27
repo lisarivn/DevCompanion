@@ -40,6 +40,7 @@ import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
 import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
+import com.example.devcompanion.feature.devtools.http.HttpClientScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,6 +74,7 @@ fun DevCompanionApp() {
         AppDestination.UuidGenerator.route -> "UUID Generator"
         AppDestination.Timestamp.route -> "Timestamp Converter"
         AppDestination.RegexChecker.route -> "Regex Checker"
+        AppDestination.HttpClient.route -> "HTTP Client"
         else -> "DevCompanion"
     }
 
@@ -276,6 +278,9 @@ fun DevCompanionApp() {
                             "regex" -> navController.navigate(
                                 AppDestination.RegexChecker.route
                             )
+                            "http" -> navController.navigate(
+                                AppDestination.HttpClient.route
+                            )
                         }
                     }
                 )
@@ -295,6 +300,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.RegexChecker.route) {
                 RegexCheckerScreen()
+            }
+
+            composable(AppDestination.HttpClient.route) {
+                HttpClientScreen()
             }
 
             // Workspace

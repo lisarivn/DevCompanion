@@ -58,4 +58,9 @@ sealed class AppDestination(
         title = "Regex Checker"
     )
 
+    data object HttpClient : AppDestination(
+        route = "devtools/http",
+        title = "HTTP Client"
+    )
+
 }
