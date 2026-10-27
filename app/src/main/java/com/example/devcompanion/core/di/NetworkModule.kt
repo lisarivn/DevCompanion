@@ -1,8 +1,6 @@
 package com.example.devcompanion.core.di
 
 import com.example.devcompanion.data.remote.api.GitHubApiService
-import com.example.devcompanion.data.repository.GitHubRepositoryImpl
-import com.example.devcompanion.domain.repository.GitHubRepositoryDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,13 +39,5 @@ object NetworkModule {
         retrofit: Retrofit
     ): GitHubApiService {
         return retrofit.create(GitHubApiService::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideGitHubRepository(
-        implementation: GitHubRepositoryImpl
-    ): GitHubRepositoryDataSource {
-        return implementation
     }
 }

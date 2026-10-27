@@ -4,6 +4,9 @@ import com.example.devcompanion.domain.model.PageResult
 import retrofit2.HttpException
 import retrofit2.Response
 
+private val PAGE_REGEX = Regex("""[?&]page=(\d+)""")
+private val NEXT_REL_REGEX = Regex("""\brel\s*=\s*"?next"?\b""", RegexOption.IGNORE_CASE)
+
 fun <T, R> Response<T>.toPageResult(
     extractItems: (T) -> List<R>
 ): PageResult<R> {
@@ -19,12 +22,13 @@ fun <T, R> Response<T>.toPageResult(
 
     val nextPage = linkHeader
         ?.split(",")
-        ?.firstOrNull { it.contains("rel=\"next\"") }
+        ?.firstOrNull { link ->
+            NEXT_REL_REGEX.containsMatchIn(link)
+        }
         ?.let { link ->
-            Regex("""[?&]page=(\d+)""")
-                .find(link)
+            PAGE_REGEX.find(link)
                 ?.groupValues
-                ?.get(1)
+                ?.getOrNull(1)
                 ?.toIntOrNull()
         }
 
