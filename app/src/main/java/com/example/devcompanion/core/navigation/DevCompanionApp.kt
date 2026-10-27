@@ -42,6 +42,7 @@ import com.example.devcompanion.feature.devtools.urlcodec.UrlCodecScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
 import com.example.devcompanion.feature.devtools.hash.HashGeneratorScreen
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
+import com.example.devcompanion.feature.devtools.color.ColorConverterScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +78,7 @@ fun DevCompanionApp() {
         AppDestination.Timestamp.route -> "Timestamp Converter"
         AppDestination.HashGenerator.route -> "Hash Generator"
         AppDestination.RegexChecker.route -> "Regex Checker"
+        AppDestination.ColorConverter.route -> "Color Converter"
         else -> "DevCompanion"
     }
 
@@ -288,6 +290,10 @@ fun DevCompanionApp() {
                             "regex" -> navController.navigate(
                                 AppDestination.RegexChecker.route
                             )
+
+                            "color" -> navController.navigate(
+                                AppDestination.ColorConverter.route
+                            )
                         }
                     }
                 )
@@ -315,6 +321,10 @@ fun DevCompanionApp() {
 
             composable(AppDestination.RegexChecker.route) {
                 RegexCheckerScreen()
+            }
+
+            composable(AppDestination.ColorConverter.route) {
+                ColorConverterScreen()
             }
 
             // Workspace

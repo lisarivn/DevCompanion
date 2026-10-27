@@ -67,4 +67,9 @@ sealed class AppDestination(
         route = "devtools/regex",
         title = "Regex Checker"
     )
+
+    data object ColorConverter : AppDestination(
+        route = "devtools/color",
+        title = "Color Converter"
+    )
 }
