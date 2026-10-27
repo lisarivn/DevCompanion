@@ -41,6 +41,7 @@ import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
 import com.example.devcompanion.feature.devtools.http.HttpClientScreen
+import com.example.devcompanion.feature.profile.ProfileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +76,7 @@ fun DevCompanionApp() {
         AppDestination.Timestamp.route -> "Timestamp Converter"
         AppDestination.RegexChecker.route -> "Regex Checker"
         AppDestination.HttpClient.route -> "HTTP Client"
+        AppDestination.Profile.route -> "GitHub Profile"
         else -> "DevCompanion"
     }
 
@@ -164,13 +166,17 @@ fun DevCompanionApp() {
                 GitHubScreen(
                     onRepositoryClick = { owner, repo ->
                         navController.navigate(
-                            AppDestination.RepositoryDetails
-                                .createRoute(owner, repo)
+                            AppDestination.RepositoryDetails.createRoute(owner, repo)
                         )
                     },
                     onFavoritesClick = {
                         navController.navigate(
                             AppDestination.Favorites.route
+                        )
+                    },
+                    onProfileClick = {
+                       navController.navigate(
+                            AppDestination.Profile.route
                         )
                     }
                 )
@@ -186,6 +192,11 @@ fun DevCompanionApp() {
                         )
                     }
                 )
+            }
+
+            // GitHub Profile
+            composable(AppDestination.Profile.route) {
+                ProfileScreen()
             }
 
             // Repository Details

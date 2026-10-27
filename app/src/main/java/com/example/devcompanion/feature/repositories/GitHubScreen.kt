@@ -1,4 +1,3 @@
-
 package com.example.devcompanion.feature.repositories
 
 import androidx.compose.foundation.clickable
@@ -37,11 +36,13 @@ import com.example.devcompanion.data.mapper.toFavoriteRepository
 import com.example.devcompanion.domain.model.GitHubRepository
 import com.example.devcompanion.feature.favorites.FavoritesViewModel
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material.icons.filled.Person
 
 @Composable
 fun GitHubScreen(
     onRepositoryClick: (owner: String, repo: String) -> Unit,
     onFavoritesClick: () -> Unit,
+    onProfileClick: () -> Unit,
     viewModel: GitHubViewModel = hiltViewModel(),
     favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
@@ -66,19 +67,39 @@ fun GitHubScreen(
             style = MaterialTheme.typography.headlineMedium
         )
 
-        OutlinedButton(
-            onClick = onFavoritesClick,
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Icon(
-                imageVector = Icons.Filled.Star,
-                contentDescription = null
-            )
+            OutlinedButton(
+                onClick = onFavoritesClick,
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Star,
+                    contentDescription = null
+                )
 
-            Text(
-                text = "Favorites",
-                modifier = Modifier.padding(start = 8.dp)
-            )
+                Text(
+                    text = "Favorites",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+
+            OutlinedButton(
+                onClick = onProfileClick,
+                modifier = Modifier.weight(1f)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = null
+                )
+
+                Text(
+                    text = "Profile",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
         }
 
         OutlinedTextField(

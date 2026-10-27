@@ -11,6 +11,7 @@ sealed class AppDestination(
     data object Dashboard : AppDestination("dashboard", "Dashboard")
     data object GitHub : AppDestination("github", "GitHub")
     data object Favorites : AppDestination("favorites", "Favorites")
+    data object Profile : AppDestination(route = "profile", title = "GitHub Profile")
     data object DevTools : AppDestination("devtools", "DevTools")
     data object Workspace : AppDestination("workspace", "Workspace")
 
