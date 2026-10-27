@@ -48,19 +48,9 @@ sealed class AppDestination(
         title = "UUID Generator"
     )
 
-    data object UrlCodec : AppDestination(
-        route = "devtools/url",
-        title = "URL Encoder / Decoder"
-    )
-
     data object Timestamp : AppDestination(
         route = "devtools/timestamp",
         title = "Timestamp Converter"
-    )
-
-    data object HashGenerator : AppDestination(
-        route = "devtools/hash",
-        title = "Hash Generator"
     )
 
     data object RegexChecker: AppDestination(
@@ -68,8 +58,4 @@ sealed class AppDestination(
         title = "Regex Checker"
     )
 
-    data object ColorConverter : AppDestination(
-        route = "devtools/color",
-        title = "Color Converter"
-    )
 }

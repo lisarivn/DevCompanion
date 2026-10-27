@@ -52,12 +52,6 @@ private val devTools = listOf(
         icon = Icons.Default.Http
     ),
     DevToolItem(
-        id = "bcrypt",
-        title = "bcrypt",
-        description = "Generate and verify hashes",
-        icon = Icons.Default.Lock
-    ),
-    DevToolItem(
         id = "uuid",
         title = "UUID",
         description = "Generate unique identifiers",
@@ -75,30 +69,6 @@ private val devTools = listOf(
         description = "Convert timestamps",
         icon = Icons.Default.Schedule
     ),
-    DevToolItem(
-        id = "urlcodec",
-        title = "URL Codec",
-        description = "Encode and decode URLs",
-        icon = Icons.Default.Link
-    ),
-    DevToolItem(
-        id = "hash",
-        title = "Hash Generator",
-        description = "SHA-256 and SHA-512",
-        icon = Icons.Default.Transform
-    ),
-    DevToolItem(
-        id = "diff",
-        title = "Text Diff",
-        description = "Compare text",
-        icon = Icons.Default.TextFields
-    ),
-    DevToolItem(
-        id = "color",
-        title = "Color Converter",
-        description = "HEX, RGB and HSL",
-        icon = Icons.Default.ColorLens
-    )
 )
 
 @Composable
@@ -123,7 +93,7 @@ fun DevToolsScreen(
         )
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(1),
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),

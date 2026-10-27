@@ -38,11 +38,8 @@ import com.example.devcompanion.feature.repositories.RepositoryDetailsScreen
 import com.example.devcompanion.feature.workspace.WorkspaceScreen
 import com.example.devcompanion.feature.devtools.json.JsonFormatterScreen
 import com.example.devcompanion.feature.devtools.uuid.UuidGeneratorScreen
-import com.example.devcompanion.feature.devtools.urlcodec.UrlCodecScreen
 import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScreen
-import com.example.devcompanion.feature.devtools.hash.HashGeneratorScreen
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
-import com.example.devcompanion.feature.devtools.color.ColorConverterScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,11 +71,8 @@ fun DevCompanionApp() {
         AppDestination.PullRequests.route -> "Pull Requests"
         AppDestination.Commits.route -> "Commits"
         AppDestination.UuidGenerator.route -> "UUID Generator"
-        AppDestination.UrlCodec.route -> "URL Encoder / Decoder"
         AppDestination.Timestamp.route -> "Timestamp Converter"
-        AppDestination.HashGenerator.route -> "Hash Generator"
         AppDestination.RegexChecker.route -> "Regex Checker"
-        AppDestination.ColorConverter.route -> "Color Converter"
         else -> "DevCompanion"
     }
 
@@ -275,24 +269,12 @@ fun DevCompanionApp() {
                                 AppDestination.UuidGenerator.route
                             )
 
-                            "urlcodec" -> navController.navigate(
-                                AppDestination.UrlCodec.route
-                            )
-
                             "timestamp" -> navController.navigate(
                                 AppDestination.Timestamp.route
                             )
 
-                            "hash" -> navController.navigate(
-                                AppDestination.HashGenerator.route
-                            )
-
                             "regex" -> navController.navigate(
                                 AppDestination.RegexChecker.route
-                            )
-
-                            "color" -> navController.navigate(
-                                AppDestination.ColorConverter.route
                             )
                         }
                     }
@@ -307,24 +289,12 @@ fun DevCompanionApp() {
                 UuidGeneratorScreen()
             }
 
-            composable(AppDestination.UrlCodec.route) {
-                UrlCodecScreen()
-            }
-
             composable(AppDestination.Timestamp.route) {
                 TimestampConverterScreen()
             }
 
-            composable(AppDestination.HashGenerator.route) {
-                HashGeneratorScreen()
-            }
-
             composable(AppDestination.RegexChecker.route) {
                 RegexCheckerScreen()
-            }
-
-            composable(AppDestination.ColorConverter.route) {
-                ColorConverterScreen()
             }
 
             // Workspace
