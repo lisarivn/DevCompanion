@@ -11,6 +11,7 @@ import com.example.devcompanion.domain.model.PageResult
 import com.example.devcompanion.domain.repository.GitHubRepositoryDataSource
 import javax.inject.Inject
 import com.example.devcompanion.data.remote.toPageResult
+import com.example.devcompanion.domain.model.GitHubUser
 
 class GitHubRepositoryImpl @Inject constructor(
     private val apiService: GitHubApiService
@@ -78,5 +79,9 @@ class GitHubRepositoryImpl @Inject constructor(
         ).toPageResult { commits ->
             commits.map { it.toDomain() }
         }
+    }
+
+    override suspend fun getUserProfile(username: String): GitHubUser {
+        return apiService.getUserProfile(username).toDomain()
     }
 }

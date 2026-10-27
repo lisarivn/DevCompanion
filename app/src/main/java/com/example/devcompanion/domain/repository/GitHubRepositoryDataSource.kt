@@ -6,6 +6,7 @@ import com.example.devcompanion.domain.model.GitHubPullRequest
 import com.example.devcompanion.domain.model.GitHubRepository
 import com.example.devcompanion.domain.model.GitHubRepositoryDetails
 import com.example.devcompanion.domain.model.PageResult
+import com.example.devcompanion.domain.model.GitHubUser
 
 interface GitHubRepositoryDataSource {
 
@@ -36,4 +37,7 @@ interface GitHubRepositoryDataSource {
         repo: String,
         page: Int = 1
     ): PageResult<GitHubCommit>
+
+    suspend fun getUserProfile(
+        username: String): GitHubUser
 }

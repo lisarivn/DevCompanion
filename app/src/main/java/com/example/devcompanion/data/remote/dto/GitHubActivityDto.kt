@@ -2,10 +2,6 @@ package com.example.devcompanion.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class GitHubUserDto(
-    val login: String
-)
-
 data class GitHubIssueDto(
     val id: Long,
     val number: Int,

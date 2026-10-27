@@ -5,6 +5,7 @@ import com.example.devcompanion.data.remote.dto.GitHubIssueDto
 import com.example.devcompanion.data.remote.dto.GitHubPullRequestDto
 import com.example.devcompanion.data.remote.dto.GitHubRepositoryDetailsDto
 import com.example.devcompanion.data.remote.dto.RepositorySearchResponseDto
+import com.example.devcompanion.data.remote.dto.GitHubUserDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -50,4 +51,9 @@ interface GitHubApiService {
         @Query("per_page") perPage: Int = 30,
         @Query("page") page: Int = 1
     ): Response<List<GitHubCommitDto>>
+
+    @GET("users/{username}")
+    suspend fun getUserProfile(
+        @Path("username") username: String
+    ): GitHubUserDto
 }
