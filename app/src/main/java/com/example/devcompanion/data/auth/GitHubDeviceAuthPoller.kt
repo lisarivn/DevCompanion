@@ -1,10 +1,12 @@
 package com.example.devcompanion.data.auth
 
+import android.os.SystemClock
 import com.example.devcompanion.data.remote.api.GitHubAuthApiService
 import com.example.devcompanion.data.remote.dto.GitHubAccessTokenDto
-import com.example.devcompanion.data.remote.dto.GitHubDeviceCodeDto
+import com.example.devcompanion.domain.model.GitHubDeviceCode
 import kotlinx.coroutines.delay
 import javax.inject.Inject
+import java.io.IOException
 
 class GitHubDeviceAuthPoller @Inject constructor(
     private val authApi: GitHubAuthApiService
@@ -12,29 +14,49 @@ class GitHubDeviceAuthPoller @Inject constructor(
 
     suspend fun awaitAccessToken(
         clientId: String,
-        deviceCode: GitHubDeviceCodeDto
+        deviceCode: GitHubDeviceCode
     ): GitHubAccessTokenDto {
 
         var intervalSeconds = deviceCode.interval.coerceAtLeast(5)
 
-        val deadline = System.nanoTime() +
-                deviceCode.expiresIn.toLong() * 1_000_000_000L
+        while (true) {
+            val remainingMillis =
+                deviceCode.expiresAtElapsedRealtime -
+                        SystemClock.elapsedRealtime()
 
-        while (System.nanoTime() < deadline) {
-
-            delay(intervalSeconds * 1000L)
-
-            if (System.nanoTime() >= deadline) {
-                break
+            if (remainingMillis <= 0L) {
+                throw IllegalStateException(
+                    "GitHub authorization code has expired."
+                )
             }
 
-            val response = authApi.requestAccessToken(
-                clientId = clientId,
-                deviceCode = deviceCode.deviceCode
+            val delayMillis = minOf(
+                intervalSeconds * 1000L,
+                remainingMillis
             )
 
-            when (response.error) {
+            delay(delayMillis)
 
+            if (SystemClock.elapsedRealtime() >=
+                deviceCode.expiresAtElapsedRealtime
+            ) {
+                throw IllegalStateException(
+                    "GitHub authorization code has expired."
+                )
+            }
+
+            val response = try {
+                authApi.requestAccessToken(
+                    clientId = clientId,
+                    deviceCode = deviceCode.deviceCode
+                )
+            } catch (e: IOException) {
+                // Temporary network error.
+                // Retry after the regular polling interval.
+                continue
+            }
+
+            when (response.error) {
                 null -> {
                     if (response.accessToken.isNullOrBlank()) {
                         throw IllegalStateException(
@@ -45,9 +67,7 @@ class GitHubDeviceAuthPoller @Inject constructor(
                     return response
                 }
 
-                "authorization_pending" -> {
-                    // User has not confirmed authorization yet.
-                }
+                "authorization_pending" -> Unit
 
                 "slow_down" -> {
                     intervalSeconds = maxOf(
@@ -58,7 +78,7 @@ class GitHubDeviceAuthPoller @Inject constructor(
 
                 "expired_token", "token_expired" -> {
                     throw IllegalStateException(
-                        "Authorization code has expired."
+                        "GitHub authorization code has expired."
                     )
                 }
 
@@ -71,14 +91,10 @@ class GitHubDeviceAuthPoller @Inject constructor(
                 else -> {
                     throw IllegalStateException(
                         response.errorDescription
-                            ?: "GitHub authorization failed: ${response.error}"
+                            ?: "GitHub authentication failed: ${response.error}"
                     )
                 }
             }
         }
-
-        throw IllegalStateException(
-            "GitHub authorization timed out."
-        )
     }
 }

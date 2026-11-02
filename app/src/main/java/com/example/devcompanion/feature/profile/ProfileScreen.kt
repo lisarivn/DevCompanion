@@ -42,9 +42,15 @@ import com.example.devcompanion.domain.model.GitHubUser
 
 @Composable
 fun ProfileScreen(
+    onLoginClick: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val isAuthenticated by viewModel.isAuthenticated.collectAsStateWithLifecycle()
+
+    val myProfile by viewModel.myProfile.collectAsStateWithLifecycle()
+    val myProfileLoading by viewModel.myProfileLoading.collectAsStateWithLifecycle()
 
     var username by rememberSaveable {
         mutableStateOf("")
@@ -63,6 +69,76 @@ fun ProfileScreen(
             text = "GitHub Profile",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Card(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = "Your GitHub Account",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                if (isAuthenticated) {
+
+                    Text(
+                        text = "✓ Connected to GitHub",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    if (myProfileLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    myProfile?.let { user ->
+
+                        AsyncImage(
+                            model = user.avatarUrl,
+                            contentDescription = "My GitHub avatar",
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(CircleShape)
+                                .align(Alignment.CenterHorizontally)
+                        )
+
+                        Text(
+                            text = "@${user.login}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+
+                    Button(
+                        onClick = onLoginClick,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Manage GitHub Account")
+                    }
+
+                } else {
+
+                    Text(
+                        text = "Sign in to connect your GitHub account with DevCompanion.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Button(
+                        onClick = onLoginClick,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Login with GitHub")
+                    }
+                }
+            }
+        }
 
         OutlinedTextField(
             value = username,

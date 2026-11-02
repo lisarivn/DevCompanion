@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import com.example.devcompanion.domain.repository.AuthRepository
+import kotlinx.coroutines.flow.collectLatest
 
 sealed interface ProfileUiState {
 
@@ -32,7 +34,8 @@ sealed interface ProfileUiState {
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val repository: GitHubRepositoryDataSource
+    private val repository: GitHubRepositoryDataSource,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState =
@@ -40,6 +43,18 @@ class ProfileViewModel @Inject constructor(
 
     val uiState: StateFlow<ProfileUiState> =
         _uiState.asStateFlow()
+
+    val isAuthenticated = authRepository.isAuthenticatedFlow
+
+    private val _myProfile = MutableStateFlow<GitHubUser?>(null)
+
+    val myProfile: StateFlow<GitHubUser?> =
+        _myProfile.asStateFlow()
+
+    private val _myProfileLoading = MutableStateFlow(false)
+
+    val myProfileLoading: StateFlow<Boolean> =
+        _myProfileLoading.asStateFlow()
 
     private var searchJob: Job? = null
 
@@ -88,6 +103,49 @@ class ProfileViewModel @Inject constructor(
                 _uiState.value = ProfileUiState.Error(
                     "Failed to load GitHub profile."
                 )
+            }
+        }
+    }
+
+    private var myProfileJob: Job? = null
+
+    fun loadMyProfile() {
+        if (!isAuthenticated.value) {
+            _myProfile.value = null
+            return
+        }
+
+        myProfileJob?.cancel()
+
+        myProfileJob = viewModelScope.launch {
+            _myProfileLoading.value = true
+
+            try {
+                val user = repository.getAuthenticatedUser()
+                _myProfile.value = user
+
+            } catch (exception: CancellationException) {
+                throw exception
+
+            } catch (exception: Exception) {
+                _myProfile.value = null
+
+            } finally {
+                _myProfileLoading.value = false
+            }
+        }
+    }
+
+    init {
+        viewModelScope.launch {
+            isAuthenticated.collectLatest { authenticated ->
+                if (authenticated) {
+                    loadMyProfile()
+                } else {
+                    myProfileJob?.cancel()
+                    _myProfile.value = null
+                    _myProfileLoading.value = false
+                }
             }
         }
     }

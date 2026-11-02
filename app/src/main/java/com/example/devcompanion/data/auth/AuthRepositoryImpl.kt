@@ -2,10 +2,12 @@ package com.example.devcompanion.data.auth
 
 import com.example.devcompanion.data.mapper.toDomain
 import com.example.devcompanion.data.remote.api.GitHubAuthApiService
-import com.example.devcompanion.data.remote.dto.GitHubDeviceCodeDto
 import com.example.devcompanion.domain.model.GitHubDeviceCode
 import com.example.devcompanion.domain.repository.AuthRepository
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: GitHubAuthApiService,
@@ -17,6 +19,13 @@ class AuthRepositoryImpl @Inject constructor(
         private const val CLIENT_ID = "Ov23liOlvrdoA5uGBnjN"
     }
 
+    private val _isAuthenticatedFlow = MutableStateFlow(
+        isAuthenticated()
+    )
+
+    override val isAuthenticatedFlow: StateFlow<Boolean> =
+        _isAuthenticatedFlow.asStateFlow()
+
     override suspend fun requestDeviceCode(): GitHubDeviceCode {
         return authApi.requestDeviceCode(
             clientId = CLIENT_ID
@@ -26,22 +35,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun awaitAccessToken(
         deviceCode: GitHubDeviceCode
     ) {
-        val dto = GitHubDeviceCodeDto(
-            deviceCode = deviceCode.deviceCode,
-            userCode = deviceCode.userCode,
-            verificationUri = deviceCode.verificationUri,
-            expiresIn = deviceCode.expiresIn,
-            interval = deviceCode.interval
-        )
-
         val response = poller.awaitAccessToken(
             clientId = CLIENT_ID,
-            deviceCode = dto
+            deviceCode = deviceCode
         )
 
-        val accessToken = requireNotNull(
-            response.accessToken
-        ) {
+        val accessToken = requireNotNull(response.accessToken) {
             "GitHub returned an empty access token."
         }
 
@@ -59,6 +58,7 @@ class AuthRepositoryImpl @Inject constructor(
         )
 
         tokenStorage.saveTokens(tokens)
+        _isAuthenticatedFlow.value = isAuthenticated()
     }
 
     override fun isAuthenticated(): Boolean {
@@ -75,5 +75,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun logout() {
         tokenStorage.clearTokens()
+        _isAuthenticatedFlow.value = false
     }
 }

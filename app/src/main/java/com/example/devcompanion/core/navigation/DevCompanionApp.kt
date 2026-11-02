@@ -42,6 +42,7 @@ import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScr
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
 import com.example.devcompanion.feature.devtools.http.HttpClientScreen
 import com.example.devcompanion.feature.profile.ProfileScreen
+import com.example.devcompanion.feature.auth.AuthScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +78,7 @@ fun DevCompanionApp() {
         AppDestination.RegexChecker.route -> "Regex Checker"
         AppDestination.HttpClient.route -> "HTTP Client"
         AppDestination.Profile.route -> "GitHub Profile"
+        AppDestination.Auth.route -> "GitHub Authentication"
         else -> "DevCompanion"
     }
 
@@ -196,7 +198,16 @@ fun DevCompanionApp() {
 
             // GitHub Profile
             composable(AppDestination.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(
+                    onLoginClick = {
+                        navController.navigate(AppDestination.Auth.route)
+                    }
+                )
+            }
+
+            // GitHub Authentication
+            composable(AppDestination.Auth.route) {
+                AuthScreen()
             }
 
             // Repository Details

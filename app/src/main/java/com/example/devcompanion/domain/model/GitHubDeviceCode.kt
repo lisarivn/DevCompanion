@@ -5,5 +5,6 @@ data class GitHubDeviceCode(
     val userCode: String,
     val verificationUri: String,
     val expiresIn: Int,
-    val interval: Int
+    val interval: Int,
+    val expiresAtElapsedRealtime: Long
 )

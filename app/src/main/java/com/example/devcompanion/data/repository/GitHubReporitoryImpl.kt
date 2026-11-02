@@ -12,9 +12,11 @@ import com.example.devcompanion.domain.repository.GitHubRepositoryDataSource
 import javax.inject.Inject
 import com.example.devcompanion.data.remote.toPageResult
 import com.example.devcompanion.domain.model.GitHubUser
+import com.example.devcompanion.data.auth.TokenStorage
 
 class GitHubRepositoryImpl @Inject constructor(
-    private val apiService: GitHubApiService
+    private val apiService: GitHubApiService,
+    private val tokenStorage: TokenStorage
 ) : GitHubRepositoryDataSource {
 
     override suspend fun searchRepositories(
@@ -83,5 +85,21 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun getUserProfile(username: String): GitHubUser {
         return apiService.getUserProfile(username).toDomain()
+    }
+
+    override suspend fun getAuthenticatedUser(): GitHubUser {
+        val tokens = tokenStorage.getTokens()
+            ?: throw IllegalStateException("User is not authenticated.")
+
+        val expiresAt = tokens.accessTokenExpiresAt
+            ?: throw IllegalStateException("Access token has no expiration information.")
+
+        if (System.currentTimeMillis() >= expiresAt) {
+            throw IllegalStateException("Access token has expired.")
+        }
+
+        return apiService.getAuthenticatedUser(
+            authorization = "Bearer ${tokens.accessToken}"
+        ).toDomain()
     }
 }

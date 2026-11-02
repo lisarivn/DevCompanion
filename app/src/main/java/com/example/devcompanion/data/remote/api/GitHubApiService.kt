@@ -10,6 +10,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Header
 
 interface GitHubApiService {
 
@@ -55,5 +56,10 @@ interface GitHubApiService {
     @GET("users/{username}")
     suspend fun getUserProfile(
         @Path("username") username: String
+    ): GitHubUserDto
+
+    @GET("user")
+    suspend fun getAuthenticatedUser(
+        @Header("Authorization") authorization: String
     ): GitHubUserDto
 }

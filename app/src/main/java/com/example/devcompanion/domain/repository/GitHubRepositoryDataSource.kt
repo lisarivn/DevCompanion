@@ -40,4 +40,6 @@ interface GitHubRepositoryDataSource {
 
     suspend fun getUserProfile(
         username: String): GitHubUser
+
+    suspend fun getAuthenticatedUser(): GitHubUser
 }

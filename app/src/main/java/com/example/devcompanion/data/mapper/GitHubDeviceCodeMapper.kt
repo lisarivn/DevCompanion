@@ -2,6 +2,7 @@ package com.example.devcompanion.data.mapper
 
 import com.example.devcompanion.data.remote.dto.GitHubDeviceCodeDto
 import com.example.devcompanion.domain.model.GitHubDeviceCode
+import android.os.SystemClock
 
 fun GitHubDeviceCodeDto.toDomain(): GitHubDeviceCode {
     return GitHubDeviceCode(
@@ -9,6 +10,8 @@ fun GitHubDeviceCodeDto.toDomain(): GitHubDeviceCode {
         userCode = userCode,
         verificationUri = verificationUri,
         expiresIn = expiresIn,
-        interval = interval
+        interval = interval,
+        expiresAtElapsedRealtime =
+            SystemClock.elapsedRealtime() + expiresIn.toLong() * 1000L
     )
 }
