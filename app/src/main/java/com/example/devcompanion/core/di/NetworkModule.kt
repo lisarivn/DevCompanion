@@ -9,6 +9,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import com.example.devcompanion.data.remote.api.GitHubAuthApiService
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -39,5 +40,18 @@ object NetworkModule {
         retrofit: Retrofit
     ): GitHubApiService {
         return retrofit.create(GitHubApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGitHubAuthApiService(
+        okHttpClient: OkHttpClient
+    ): GitHubAuthApiService {
+        return Retrofit.Builder()
+            .baseUrl("https://github.com/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(GitHubAuthApiService::class.java)
     }
 }
