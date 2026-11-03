@@ -1,6 +1,5 @@
 package com.example.devcompanion.feature.repositories
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,7 +41,7 @@ import androidx.compose.material.icons.filled.Person
 fun GitHubScreen(
     onRepositoryClick: (owner: String, repo: String) -> Unit,
     onFavoritesClick: () -> Unit,
-    onProfileClick: () -> Unit,
+    onUsersClick: () -> Unit,
     viewModel: GitHubViewModel = hiltViewModel(),
     favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
@@ -87,7 +86,7 @@ fun GitHubScreen(
             }
 
             OutlinedButton(
-                onClick = onProfileClick,
+                onClick = onUsersClick,
                 modifier = Modifier.weight(1f)
             ) {
                 Icon(
@@ -96,7 +95,7 @@ fun GitHubScreen(
                 )
 
                 Text(
-                    text = "Profile",
+                    text = "Search Users",
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }
