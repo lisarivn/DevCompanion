@@ -13,6 +13,7 @@ import javax.inject.Inject
 import com.example.devcompanion.data.remote.toPageResult
 import com.example.devcompanion.domain.model.GitHubUser
 import com.example.devcompanion.data.auth.TokenStorage
+import com.example.devcompanion.domain.model.GitHubEvent
 
 class GitHubRepositoryImpl @Inject constructor(
     private val apiService: GitHubApiService,
@@ -101,5 +102,12 @@ class GitHubRepositoryImpl @Inject constructor(
         return apiService.getAuthenticatedUser(
             authorization = "Bearer ${tokens.accessToken}"
         ).toDomain()
+    }
+
+    override suspend fun getPublicEvents(
+        username: String
+    ): List<GitHubEvent> {
+        return apiService.getPublicEvents(username)
+            .map { it.toDomain() }
     }
 }

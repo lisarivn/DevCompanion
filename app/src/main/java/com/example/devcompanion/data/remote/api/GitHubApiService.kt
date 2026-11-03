@@ -6,6 +6,7 @@ import com.example.devcompanion.data.remote.dto.GitHubPullRequestDto
 import com.example.devcompanion.data.remote.dto.GitHubRepositoryDetailsDto
 import com.example.devcompanion.data.remote.dto.RepositorySearchResponseDto
 import com.example.devcompanion.data.remote.dto.GitHubUserDto
+import com.example.devcompanion.data.remote.dto.GitHubEventDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -62,4 +63,10 @@ interface GitHubApiService {
     suspend fun getAuthenticatedUser(
         @Header("Authorization") authorization: String
     ): GitHubUserDto
+
+    @GET("users/{username}/events/public")
+    suspend fun getPublicEvents(
+        @Path("username") username: String,
+        @Query("per_page") perPage: Int = 10
+    ): List<GitHubEventDto>
 }

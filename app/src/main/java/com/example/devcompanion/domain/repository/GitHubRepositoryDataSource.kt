@@ -7,6 +7,7 @@ import com.example.devcompanion.domain.model.GitHubRepository
 import com.example.devcompanion.domain.model.GitHubRepositoryDetails
 import com.example.devcompanion.domain.model.PageResult
 import com.example.devcompanion.domain.model.GitHubUser
+import com.example.devcompanion.domain.model.GitHubEvent
 
 interface GitHubRepositoryDataSource {
 
@@ -42,4 +43,6 @@ interface GitHubRepositoryDataSource {
         username: String): GitHubUser
 
     suspend fun getAuthenticatedUser(): GitHubUser
+
+    suspend fun getPublicEvents(username: String): List<GitHubEvent>
 }

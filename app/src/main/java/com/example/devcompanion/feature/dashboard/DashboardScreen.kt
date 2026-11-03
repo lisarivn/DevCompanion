@@ -1,4 +1,3 @@
-
 package com.example.devcompanion.feature.dashboard
 
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +33,7 @@ import com.example.devcompanion.domain.model.FavoriteRepository
 import com.example.devcompanion.feature.auth.AuthContent
 import com.example.devcompanion.feature.auth.AuthViewModel
 import com.example.devcompanion.feature.profile.ProfileViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun DashboardScreen(
@@ -46,6 +46,18 @@ fun DashboardScreen(
     val isAuthenticated by profileViewModel.isAuthenticated.collectAsStateWithLifecycle()
     val myProfile by profileViewModel.myProfile.collectAsStateWithLifecycle()
     val myProfileLoading by profileViewModel.myProfileLoading.collectAsStateWithLifecycle()
+
+    val events by viewModel.events.collectAsStateWithLifecycle()
+    val eventsLoading by viewModel.eventsLoading.collectAsStateWithLifecycle()
+    val eventsError by viewModel.eventsError.collectAsStateWithLifecycle()
+
+    LaunchedEffect(isAuthenticated, myProfile?.login) {
+        if (isAuthenticated && myProfile != null) {
+            viewModel.loadEvents(myProfile!!.login)
+        } else {
+            viewModel.clearEvents()
+        }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -198,6 +210,76 @@ fun DashboardScreen(
                 key = { it.id }
             ) { repository ->
                 RecentFavoriteCard(repository)
+            }
+        }
+
+        item {
+            Text(
+                text = "Recent GitHub Activity",
+                style = MaterialTheme.typography.titleLarge
+            )
+        }
+
+        when {
+            !isAuthenticated -> {
+                item {
+                    Text("Login to view your GitHub activity.")
+                }
+            }
+
+            myProfile == null -> {
+                item {
+                    Text("Waiting for GitHub profile...")
+                }
+            }
+
+            eventsLoading -> {
+                item {
+                    CircularProgressIndicator()
+                }
+            }
+
+            eventsError != null -> {
+                item {
+                    Text(
+                        text = eventsError ?: "",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+
+            events.isEmpty() -> {
+                item {
+                    Text("No recent public activity found.")
+                }
+            }
+
+            else -> {
+                items(
+                    items = events,
+                    key = { "event_${it.id}" }
+                ) { event ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                text = event.description,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+
+                            Text(event.repositoryName)
+
+                            Text(
+                                text = event.createdAt,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                }
             }
         }
     }
