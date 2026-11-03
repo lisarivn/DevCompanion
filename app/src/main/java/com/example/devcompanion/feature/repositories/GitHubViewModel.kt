@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import com.example.devcompanion.domain.repository.AuthRepository
+import kotlinx.coroutines.flow.collectLatest
 
 data class GitHubUiState(
     val query: String = "",
@@ -37,7 +39,8 @@ data class MyRepositoriesUiState(
 
 @HiltViewModel
 class GitHubViewModel @Inject constructor(
-    private val repository: GitHubRepositoryDataSource
+    private val repository: GitHubRepositoryDataSource,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GitHubUiState())
@@ -52,6 +55,18 @@ class GitHubViewModel @Inject constructor(
     val myRepositoriesState = _myRepositoriesState.asStateFlow()
 
     private var myRepositoriesJob: Job? = null
+
+    val isAuthenticated = authRepository.isAuthenticatedFlow
+
+    init {
+        viewModelScope.launch {
+            authRepository.isAuthenticatedFlow.collectLatest { authenticated ->
+                if (!authenticated) {
+                    clearMyRepositories()
+                }
+            }
+        }
+    }
 
     fun updateQuery(query: String) {
         _uiState.update {
@@ -184,6 +199,9 @@ class GitHubViewModel @Inject constructor(
     }
 
     fun loadMyRepositories() {
+        if (!authRepository.isAuthenticatedFlow.value) {
+            return
+        }
         val current = _myRepositoriesState.value
 
         if (current.isLoading || current.hasLoaded) {
@@ -226,6 +244,9 @@ class GitHubViewModel @Inject constructor(
     }
 
     fun loadMoreMyRepositories() {
+        if (!authRepository.isAuthenticatedFlow.value) {
+            return
+        }
         val current = _myRepositoriesState.value
         val page = current.nextPage ?: return
 
