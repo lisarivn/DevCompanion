@@ -7,6 +7,7 @@ import com.example.devcompanion.data.remote.dto.GitHubRepositoryDetailsDto
 import com.example.devcompanion.data.remote.dto.RepositorySearchResponseDto
 import com.example.devcompanion.data.remote.dto.GitHubUserDto
 import com.example.devcompanion.data.remote.dto.GitHubEventDto
+import com.example.devcompanion.data.remote.dto.GitHubRepositoryDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -69,4 +70,12 @@ interface GitHubApiService {
         @Path("username") username: String,
         @Query("per_page") perPage: Int = 10
     ): List<GitHubEventDto>
+
+    @GET("user/repos")
+    suspend fun getMyRepositories(
+        @Header("Authorization") authorization: String,
+        @Query("affiliation") affiliation: String = "owner",
+        @Query("per_page") perPage: Int = 20,
+        @Query("page") page: Int = 1
+    ): Response<List<GitHubRepositoryDto>>
 }

@@ -32,6 +32,29 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getMyRepositories(
+        page: Int
+    ): PageResult<GitHubRepository> {
+        val tokens = tokenStorage.getTokens()
+            ?: throw IllegalStateException("User is not authenticated.")
+
+        val expiresAt = tokens.accessTokenExpiresAt
+            ?: throw IllegalStateException(
+                "Access token has no expiration information."
+            )
+
+        if (System.currentTimeMillis() >= expiresAt) {
+            throw IllegalStateException("Access token has expired.")
+        }
+
+        return apiService.getMyRepositories(
+            authorization = "Bearer ${tokens.accessToken}",
+            page = page
+        ).toPageResult { repositories ->
+            repositories.map { it.toDomain() }
+        }
+    }
+
     override suspend fun getRepositoryDetails(
         owner: String,
         repo: String

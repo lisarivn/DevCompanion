@@ -45,4 +45,8 @@ interface GitHubRepositoryDataSource {
     suspend fun getAuthenticatedUser(): GitHubUser
 
     suspend fun getPublicEvents(username: String): List<GitHubEvent>
+
+    suspend fun getMyRepositories(
+        page: Int = 1
+    ): PageResult<GitHubRepository>
 }
