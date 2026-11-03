@@ -26,6 +26,15 @@ data class GitHubUiState(
     val hasSearched: Boolean = false
 )
 
+data class MyRepositoriesUiState(
+    val repositories: List<GitHubRepository> = emptyList(),
+    val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val nextPage: Int? = 1,
+    val error: String? = null,
+    val hasLoaded: Boolean = false
+)
+
 @HiltViewModel
 class GitHubViewModel @Inject constructor(
     private val repository: GitHubRepositoryDataSource
@@ -35,6 +44,14 @@ class GitHubViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     private var searchJob: Job? = null
+
+    private val _myRepositoriesState = MutableStateFlow(
+        MyRepositoriesUiState()
+    )
+
+    val myRepositoriesState = _myRepositoriesState.asStateFlow()
+
+    private var myRepositoriesJob: Job? = null
 
     fun updateQuery(query: String) {
         _uiState.update {
@@ -164,5 +181,98 @@ class GitHubViewModel @Inject constructor(
             else ->
                 "Unable to load repositories."
         }
+    }
+
+    fun loadMyRepositories() {
+        val current = _myRepositoriesState.value
+
+        if (current.isLoading || current.hasLoaded) {
+            return
+        }
+
+        myRepositoriesJob?.cancel()
+
+        _myRepositoriesState.update {
+            it.copy(
+                isLoading = true,
+                isLoadingMore = false,
+                error = null
+            )
+        }
+
+        myRepositoriesJob = viewModelScope.launch {
+            try {
+                val result = repository.getMyRepositories(page = 1)
+
+                _myRepositoriesState.update {
+                    it.copy(
+                        repositories = result.items,
+                        nextPage = result.nextPage,
+                        isLoading = false,
+                        hasLoaded = true
+                    )
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                _myRepositoriesState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = errorMessage(exception)
+                    )
+                }
+            }
+        }
+    }
+
+    fun loadMoreMyRepositories() {
+        val current = _myRepositoriesState.value
+        val page = current.nextPage ?: return
+
+        if (
+            !current.hasLoaded ||
+            current.isLoading ||
+            current.isLoadingMore
+        ) {
+            return
+        }
+
+        _myRepositoriesState.update {
+            it.copy(
+                isLoadingMore = true,
+                error = null
+            )
+        }
+
+        myRepositoriesJob = viewModelScope.launch {
+            try {
+                val result = repository.getMyRepositories(page = page)
+
+                _myRepositoriesState.update {
+                    it.copy(
+                        repositories = (
+                                it.repositories + result.items
+                                ).distinctBy { repository -> repository.id },
+                        nextPage = result.nextPage,
+                        isLoadingMore = false
+                    )
+                }
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                _myRepositoriesState.update {
+                    it.copy(
+                        isLoadingMore = false,
+                        error = errorMessage(exception))
+                }
+            }
+        }
+    }
+
+    fun clearMyRepositories() {
+        myRepositoriesJob?.cancel()
+        myRepositoriesJob = null
+
+        _myRepositoriesState.value = MyRepositoriesUiState()
     }
 }
