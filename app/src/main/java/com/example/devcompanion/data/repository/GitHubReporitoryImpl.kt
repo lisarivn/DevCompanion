@@ -22,10 +22,25 @@ class GitHubRepositoryImpl @Inject constructor(
 
     override suspend fun searchRepositories(
         query: String,
-        page: Int
+        page: Int,
+        language: String?,
+        sort: String?,
+        order: String
     ): PageResult<GitHubRepository> {
+
+        val searchQuery = buildString {
+            append(query.trim())
+
+            if (!language.isNullOrBlank()) {
+                append(" language:")
+                append(language)
+            }
+        }
+
         return apiService.searchRepositories(
-            query = query,
+            query = searchQuery,
+            sort = sort,
+            order = order,
             page = page
         ).toPageResult { response ->
             response.items.map { it.toDomain() }
@@ -33,7 +48,9 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getMyRepositories(
-        page: Int
+        page: Int,
+        sort: String,
+        direction: String
     ): PageResult<GitHubRepository> {
         val tokens = tokenStorage.getTokens()
             ?: throw IllegalStateException("User is not authenticated.")
@@ -49,6 +66,8 @@ class GitHubRepositoryImpl @Inject constructor(
 
         return apiService.getMyRepositories(
             authorization = "Bearer ${tokens.accessToken}",
+            sort = sort,
+            direction = direction,
             page = page
         ).toPageResult { repositories ->
             repositories.map { it.toDomain() }

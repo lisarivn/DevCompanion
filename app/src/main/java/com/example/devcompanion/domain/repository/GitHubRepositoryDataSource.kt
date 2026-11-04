@@ -13,7 +13,10 @@ interface GitHubRepositoryDataSource {
 
     suspend fun searchRepositories(
         query: String,
-        page: Int = 1
+        page: Int = 1,
+        language: String? = null,
+        sort: String? = null,
+        order: String = "desc"
     ): PageResult<GitHubRepository>
 
     suspend fun getRepositoryDetails(
@@ -47,6 +50,9 @@ interface GitHubRepositoryDataSource {
     suspend fun getPublicEvents(username: String): List<GitHubEvent>
 
     suspend fun getMyRepositories(
-        page: Int = 1
+        page: Int = 1,
+        sort: String = "updated",
+        direction: String = "desc"
     ): PageResult<GitHubRepository>
+
 }

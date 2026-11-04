@@ -78,4 +78,23 @@ interface GitHubApiService {
         @Query("per_page") perPage: Int = 20,
         @Query("page") page: Int = 1
     ): Response<List<GitHubRepositoryDto>>
+
+    @GET("search/repositories")
+    suspend fun searchRepositories(
+        @Query("q") query: String,
+        @Query("sort") sort: String? = null,
+        @Query("order") order: String = "desc",
+        @Query("per_page") perPage: Int = 20,
+        @Query("page") page: Int = 1
+    ): Response<RepositorySearchResponseDto>
+
+    @GET("user/repos")
+    suspend fun getMyRepositories(
+        @Header("Authorization") authorization: String,
+        @Query("affiliation") affiliation: String = "owner",
+        @Query("sort") sort: String = "updated",
+        @Query("direction") direction: String = "desc",
+        @Query("per_page") perPage: Int = 20,
+        @Query("page") page: Int = 1
+    ): Response<List<GitHubRepositoryDto>>
 }

@@ -41,8 +41,13 @@ import androidx.compose.material3.TabRow
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.ExperimentalMaterial3Api
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GitHubScreen(
     onRepositoryClick: (owner: String, repo: String) -> Unit,
@@ -131,7 +136,96 @@ fun GitHubScreen(
         }
 
         if (selectedTab == 0) {
-            // Публічний пошук репозиторіїв.
+            // Публічний пошук репозиторіїв
+
+            val languages = listOf(
+                "All", "Kotlin", "Java", "Python",
+                "JavaScript", "TypeScript", "C++", "C#"
+            )
+
+            var languageExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            val sortOptions = listOf(
+                "Best match",
+                "Stars",
+                "Recently updated"
+            )
+
+            var sortExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            ExposedDropdownMenuBox(
+                expanded = languageExpanded,
+                onExpandedChange = { languageExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = uiState.language,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Language") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = languageExpanded
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = languageExpanded,
+                    onDismissRequest = { languageExpanded = false }
+                ) {
+                    languages.forEach { language ->
+                        DropdownMenuItem(
+                            text = { Text(language) },
+                            onClick = {
+                                viewModel.updateLanguage(language)
+                                languageExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            ExposedDropdownMenuBox(
+                expanded = sortExpanded,
+                onExpandedChange = { sortExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = uiState.sort,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Sort by") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = sortExpanded
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = sortExpanded,
+                    onDismissRequest = { sortExpanded = false }
+                ) {
+                    sortOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                viewModel.updateSort(option)
+                                sortExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             OutlinedTextField(
                 value = uiState.query,
@@ -248,7 +342,101 @@ fun GitHubScreen(
             }
 
         } else {
-            // Власні репозиторії користувача.
+            // Власні репозиторії користувача
+
+            val mySortOptions = listOf(
+                "Recently updated",
+                "Recently created",
+                "Recently pushed",
+                "Name (A-Z)"
+            )
+
+            val myLanguages = listOf(
+                "All", "Kotlin", "Java", "Python",
+                "JavaScript", "TypeScript", "C++", "C#"
+            )
+
+            var myLanguage by remember {
+                mutableStateOf("All")
+            }
+
+            var myLanguageExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            ExposedDropdownMenuBox(
+                expanded = myLanguageExpanded,
+                onExpandedChange = { myLanguageExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = myLanguage,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Language") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = myLanguageExpanded
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = myLanguageExpanded,
+                    onDismissRequest = { myLanguageExpanded = false }
+                ) {
+                    myLanguages.forEach { language ->
+                        DropdownMenuItem(
+                            text = { Text(language) },
+                            onClick = {
+                                myLanguage = language
+                                myLanguageExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            var mySortExpanded by remember {
+                mutableStateOf(false)
+            }
+
+            ExposedDropdownMenuBox(
+                expanded = mySortExpanded,
+                onExpandedChange = { mySortExpanded = it }
+            ) {
+                OutlinedTextField(
+                    value = myRepositoriesState.sort,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Sort by") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = mySortExpanded
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                )
+
+                ExposedDropdownMenu(
+                    expanded = mySortExpanded,
+                    onDismissRequest = { mySortExpanded = false }
+                ) {
+                    mySortOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                viewModel.updateMyRepositoriesSort(option)
+                                mySortExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
 
             if (!isAuthenticated) {
                 Text(
@@ -285,7 +473,13 @@ fun GitHubScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(
-                        items = myRepositoriesState.repositories,
+                        items = myRepositoriesState.repositories.filter { repository ->
+                            myLanguage == "All" ||
+                                    repository.language.equals(
+                                        myLanguage,
+                                        ignoreCase = true
+                                    )
+                        },
                         key = { it.id }
                     ) { repository ->
                         RepositoryCard(

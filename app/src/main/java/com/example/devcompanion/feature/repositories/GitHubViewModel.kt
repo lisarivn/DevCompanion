@@ -20,6 +20,13 @@ import kotlinx.coroutines.flow.collectLatest
 data class GitHubUiState(
     val query: String = "",
     val activeQuery: String = "",
+
+    val language: String = "All",
+    val sort: String = "Best match",
+
+    val activeLanguage: String = "All",
+    val activeSort: String = "Best match",
+
     val repositories: List<GitHubRepository> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
@@ -30,6 +37,10 @@ data class GitHubUiState(
 
 data class MyRepositoriesUiState(
     val repositories: List<GitHubRepository> = emptyList(),
+
+    val sort: String = "Recently updated",
+    val activeSort: String = "Recently updated",
+
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val nextPage: Int? = 1,
@@ -74,8 +85,50 @@ class GitHubViewModel @Inject constructor(
         }
     }
 
+    fun updateLanguage(language: String) {
+        _uiState.update {
+            it.copy(language = language)
+        }
+    }
+
+    fun updateSort(sort: String) {
+        _uiState.update {
+            it.copy(sort = sort)
+        }
+    }
+
+    fun updateMyRepositoriesSort(sort: String) {
+        if (_myRepositoriesState.value.sort == sort) return
+        myRepositoriesJob?.cancel()
+        _myRepositoriesState.update {
+            it.copy(
+                sort = sort,
+                activeSort = sort,
+                repositories = emptyList(),
+                nextPage = 1,
+                isLoading = false,
+                isLoadingMore = false,
+                error = null,
+                hasLoaded = false
+            )
+        }
+        loadMyRepositories()
+    }
+
     fun searchRepositories() {
         val query = _uiState.value.query.trim()
+
+        val language = _uiState.value.language
+        val sort = _uiState.value.sort
+
+        val apiLanguage = language.takeUnless { it == "All" }
+
+        val apiSort = when (sort) {
+            "Stars" -> "stars"
+            "Recently updated" -> "updated"
+            else -> null
+        }
+
 
         if (query.isBlank()) {
             _uiState.update {
@@ -96,7 +149,9 @@ class GitHubViewModel @Inject constructor(
                 isLoading = true,
                 isLoadingMore = false,
                 error = null,
-                hasSearched = true
+                hasSearched = true,
+                activeLanguage = language,
+                activeSort = sort,
             )
         }
 
@@ -104,7 +159,9 @@ class GitHubViewModel @Inject constructor(
             try {
                 val result = repository.searchRepositories(
                     query = query,
-                    page = 1
+                    page = 1,
+                    language = apiLanguage,
+                    sort = apiSort
                 )
 
                 _uiState.update {
@@ -150,9 +207,16 @@ class GitHubViewModel @Inject constructor(
 
         searchJob = viewModelScope.launch {
             try {
+                val apiSort = when (current.activeSort) {
+                    "Stars" -> "stars"
+                    "Recently updated" -> "updated"
+                    else -> null
+                }
                 val result = repository.searchRepositories(
                     query = current.activeQuery,
-                    page = page
+                    page = page,
+                    language = current.activeLanguage.takeUnless { it == "All" },
+                    sort = apiSort
                 )
 
                 _uiState.update {
@@ -220,14 +284,27 @@ class GitHubViewModel @Inject constructor(
 
         myRepositoriesJob = viewModelScope.launch {
             try {
-                val result = repository.getMyRepositories(page = 1)
+                val activeSort = _myRepositoriesState.value.sort
+                val apiSort = when (activeSort) {
+                    "Name (A-Z)" -> "full_name"
+                    "Recently created" -> "created"
+                    "Recently pushed" -> "pushed"
+                    else -> "updated"
+                }
+                val direction = if (activeSort == "Name (A-Z)") "asc" else "desc"
+                val result = repository.getMyRepositories(
+                    page = 1,
+                    sort = apiSort,
+                    direction = direction
+                )
 
                 _myRepositoriesState.update {
                     it.copy(
                         repositories = result.items,
                         nextPage = result.nextPage,
                         isLoading = false,
-                        hasLoaded = true
+                        hasLoaded = true,
+                        activeSort = activeSort
                     )
                 }
             } catch (exception: CancellationException) {
@@ -267,7 +344,24 @@ class GitHubViewModel @Inject constructor(
 
         myRepositoriesJob = viewModelScope.launch {
             try {
-                val result = repository.getMyRepositories(page = page)
+                val apiSort = when (current.activeSort) {
+                    "Name (A-Z)" -> "full_name"
+                    "Recently created" -> "created"
+                    "Recently pushed" -> "pushed"
+                    else -> "updated"
+                }
+
+                val direction = if (current.activeSort == "Name (A-Z)") {
+                    "asc"
+                } else {
+                    "desc"
+                }
+
+                val result = repository.getMyRepositories(
+                    page = page,
+                    sort = apiSort,
+                    direction = direction
+                )
 
                 _myRepositoriesState.update {
                     it.copy(
