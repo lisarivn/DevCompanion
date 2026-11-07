@@ -24,7 +24,8 @@ data class ActivityUiState<T>(
     val nextPage: Int? = 1,
     val error: String? = null,
     val repositoryKey: String? = null,
-    val hasLoaded: Boolean = false
+    val hasLoaded: Boolean = false,
+    val issueFilter: String = "all"
 )
 
 @HiltViewModel
@@ -166,7 +167,24 @@ class RepositoryActivityViewModel @Inject constructor(
         setJob(job)
     }
 
-    // ---------- ISSUES ----------
+    fun updateIssuesFilter(
+        owner: String,
+        repo: String,
+        filter: String
+    ) {
+        if (filter !in listOf("open", "closed", "all")) return
+        if (_issues.value.issueFilter == filter) return
+
+        issuesJob?.cancel()
+        issuesJob = null
+
+        _issues.value = ActivityUiState(
+            repositoryKey = repositoryKey(owner, repo),
+            issueFilter = filter
+        )
+
+        loadIssues(owner, repo)
+    }
 
     fun initializeIssues(owner: String, repo: String) {
         prepareState(
@@ -186,20 +204,42 @@ class RepositoryActivityViewModel @Inject constructor(
     }
 
     fun loadIssues(owner: String, repo: String) {
+        val filter = _issues.value.issueFilter
+
+        android.util.Log.d(
+            "IssuesDebug",
+            "loadIssues called: $owner/$repo, filter=$filter"
+        )
+
         loadPage(
             state = _issues,
             owner = owner,
             repo = repo,
             maxPagesPerLoad = 5,
             loader = { page ->
-                repository.getIssues(owner, repo, page)
+                android.util.Log.d(
+                    "IssuesDebug",
+                    "Requesting page=$page"
+                )
+
+                val result = repository.getIssues(
+                    owner = owner,
+                    repo = repo,
+                    page = page,
+                    state = filter
+                )
+
+                android.util.Log.d(
+                    "IssuesDebug",
+                    "Received ${result.items.size} issues"
+                )
+
+                result
             },
             itemId = { it.id },
             setJob = { issuesJob = it }
         )
     }
-
-    // ---------- PULL REQUESTS ----------
 
     fun initializePullRequests(owner: String, repo: String) {
         prepareState(
@@ -230,8 +270,6 @@ class RepositoryActivityViewModel @Inject constructor(
             setJob = { pullsJob = it }
         )
     }
-
-    // ---------- COMMITS ----------
 
     fun initializeCommits(owner: String, repo: String) {
         prepareState(

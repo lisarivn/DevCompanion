@@ -38,6 +38,13 @@ interface GitHubApiService {
         @Query("page") page: Int = 1
     ): Response<List<GitHubIssueDto>>
 
+    @GET("repos/{owner}/{repo}/issues/{issue_number}")
+    suspend fun getIssueDetails(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("issue_number") issueNumber: Int
+    ): GitHubIssueDto
+
     @GET("repos/{owner}/{repo}/pulls")
     suspend fun getPullRequests(
         @Path("owner") owner: String,

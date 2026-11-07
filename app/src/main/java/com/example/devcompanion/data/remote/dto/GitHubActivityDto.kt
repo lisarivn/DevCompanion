@@ -2,6 +2,7 @@ package com.example.devcompanion.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+
 data class GitHubIssueDto(
     val id: Long,
     val number: Int,
@@ -15,8 +16,20 @@ data class GitHubIssueDto(
     val labels: List<GitHubLabelDto>,
 
     @SerializedName("pull_request")
-    val pullRequest: GitHubPullRequestReferenceDto?
+    val pullRequest: GitHubPullRequestReferenceDto?,
+
+    val body: String? = null,
+
+    @SerializedName("updated_at")
+    val updatedAt: String? = null,
+
+    @SerializedName("closed_at")
+    val closedAt: String? = null,
+
+    @SerializedName("html_url")
+    val htmlUrl: String? = null
 )
+
 
 data class GitHubLabelDto(
     val name: String

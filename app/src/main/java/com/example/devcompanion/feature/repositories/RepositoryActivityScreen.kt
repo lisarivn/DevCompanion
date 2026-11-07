@@ -25,6 +25,7 @@ fun <T> RepositoryActivityScreen(
     onRetry: () -> Unit,
     onLoadMore: () -> Unit,
     itemKey: (T) -> Any,
+    onItemClick: ((T) -> Unit)? = null,
     itemContent: @Composable (T) -> Unit
 ) {
     when {
@@ -56,7 +57,7 @@ fun <T> RepositoryActivityScreen(
             }
         }
 
-        state.items.isEmpty() && state.nextPage == null -> {
+        state.items.isEmpty() && state.hasLoaded -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -75,7 +76,12 @@ fun <T> RepositoryActivityScreen(
                     items = state.items,
                     key = itemKey
                 ) { item ->
-                    Card(modifier = Modifier.fillMaxWidth()) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            onItemClick?.invoke(item)
+                        }
+                    ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             itemContent(item)
                         }

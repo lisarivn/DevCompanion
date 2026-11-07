@@ -29,6 +29,18 @@ sealed class AppDestination(
         "Issues"
     )
 
+    data object IssueDetails : AppDestination(
+        "repository/{owner}/{repo}/issues/{issueNumber}",
+        "Issue Details"
+    ) {
+        fun createRoute(
+            owner: String,
+            repo: String,
+            issueNumber: Int
+        ): String =
+            "repository/${Uri.encode(owner)}/${Uri.encode(repo)}/issues/$issueNumber"
+    }
+
     data object PullRequests : AppDestination(
         "repository/{owner}/{repo}/pulls",
         "Pull Requests"

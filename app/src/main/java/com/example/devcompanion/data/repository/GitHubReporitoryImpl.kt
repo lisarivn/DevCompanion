@@ -85,17 +85,31 @@ class GitHubRepositoryImpl @Inject constructor(
     override suspend fun getIssues(
         owner: String,
         repo: String,
-        page: Int
+        page: Int,
+        state: String
     ): PageResult<GitHubIssue> {
         return apiService.getIssues(
             owner = owner,
             repo = repo,
+            state = state,
             page = page
         ).toPageResult { issues ->
             issues
                 .filter { it.pullRequest == null }
                 .map { it.toDomain() }
         }
+    }
+
+    override suspend fun getIssueDetails(
+        owner: String,
+        repo: String,
+        issueNumber: Int
+    ): GitHubIssue {
+        return apiService.getIssueDetails(
+            owner = owner,
+            repo = repo,
+            issueNumber = issueNumber
+        ).toDomain()
     }
 
     override suspend fun getPullRequests(

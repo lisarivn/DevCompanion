@@ -14,7 +14,11 @@ fun GitHubIssueDto.toDomain() = GitHubIssue(
     state = state,
     author = user?.login ?: "Unknown",
     createdAt = createdAt,
-    labels = labels.map { it.name }
+    labels = labels.map { it.name },
+    body = body,
+    updatedAt = updatedAt,
+    closedAt = closedAt,
+    htmlUrl = htmlUrl
 )
 
 fun GitHubPullRequestDto.toDomain() = GitHubPullRequest(

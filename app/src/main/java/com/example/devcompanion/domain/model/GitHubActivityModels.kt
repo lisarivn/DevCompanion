@@ -7,7 +7,11 @@ data class GitHubIssue(
     val state: String,
     val author: String,
     val createdAt: String,
-    val labels: List<String>
+    val labels: List<String>,
+    val body: String? = null,
+    val updatedAt: String? = null,
+    val closedAt: String? = null,
+    val htmlUrl: String? = null
 )
 
 data class GitHubPullRequest(

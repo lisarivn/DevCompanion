@@ -42,6 +42,7 @@ import com.example.devcompanion.feature.devtools.timestamp.TimestampConverterScr
 import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
 import com.example.devcompanion.feature.devtools.http.HttpClientScreen
 import com.example.devcompanion.feature.profile.ProfileScreen
+import com.example.devcompanion.feature.issues.IssueDetailsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +78,7 @@ fun DevCompanionApp() {
         AppDestination.RegexChecker.route -> "Regex Checker"
         AppDestination.HttpClient.route -> "HTTP Client"
         AppDestination.Profile.route -> "GitHub Profile"
+        AppDestination.IssueDetails.route -> "Issue Details"
         else -> "DevCompanion"
     }
 
@@ -239,12 +241,45 @@ fun DevCompanionApp() {
                 )
             }
 
+
             // Issues
             composable(AppDestination.Issues.route) { entry ->
                 val owner = entry.arguments?.getString("owner").orEmpty()
                 val repo = entry.arguments?.getString("repo").orEmpty()
 
-                IssuesScreen(owner = owner, repo = repo)
+                IssuesScreen(
+                    owner = owner,
+                    repo = repo,
+                    onIssueClick = { issueNumber ->
+                        navController.navigate(
+                            AppDestination.IssueDetails.createRoute(
+                                owner = owner,
+                                repo = repo,
+                                issueNumber = issueNumber
+                            )
+                        )
+                    }
+                )
+            }
+
+
+            composable(
+                route = AppDestination.IssueDetails.route,
+                arguments = listOf(
+                    navArgument("owner") { type = NavType.StringType },
+                    navArgument("repo") { type = NavType.StringType },
+                    navArgument("issueNumber") { type = NavType.IntType }
+                )
+            ) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+                val issueNumber = entry.arguments?.getInt("issueNumber") ?: 0
+
+                IssueDetailsScreen(
+                    owner = owner,
+                    repo = repo,
+                    issueNumber = issueNumber
+                )
             }
 
             // Pull Requests

@@ -27,8 +27,15 @@ interface GitHubRepositoryDataSource {
     suspend fun getIssues(
         owner: String,
         repo: String,
-        page: Int = 1
+        page: Int = 1,
+        state: String = "all"
     ): PageResult<GitHubIssue>
+
+    suspend fun getIssueDetails(
+        owner: String,
+        repo: String,
+        issueNumber: Int
+    ): GitHubIssue
 
     suspend fun getPullRequests(
         owner: String,
