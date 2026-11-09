@@ -15,6 +15,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.Alignment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CallMerge
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun PullRequestsScreen(
@@ -71,10 +79,40 @@ fun PullRequestsScreen(
             ) { pull ->
                 Text("#${pull.number} ${pull.title}")
 
-                Text(
-                    if (pull.isMerged) "State: Merged"
-                    else "State: ${pull.state}"
-                )
+
+                val status = when {
+                    pull.isMerged -> "Merged"
+                    pull.state.equals("open", ignoreCase = true) -> "Open"
+                    else -> "Closed"
+                }
+
+                val statusColor = when (status) {
+                    "Open" -> Color(0xFF238636)
+                    "Merged" -> Color(0xFF8957E5)
+                    else -> Color(0xFFDA3633)
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = when (status) {
+                            "Open" -> Icons.Default.CallMerge
+                            "Merged" -> Icons.Default.CheckCircle
+                            else -> Icons.Default.Close
+                        },
+                        contentDescription = null,
+                        tint = statusColor
+                    )
+
+                    Text(
+                        text = status,
+                        color = statusColor,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+
 
                 Text("Author: ${pull.author}")
                 Text("${pull.headBranch} → ${pull.baseBranch}")
