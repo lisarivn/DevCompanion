@@ -28,8 +28,10 @@ import androidx.compose.ui.graphics.Color
 fun PullRequestsScreen(
     owner: String,
     repo: String,
+    onPullRequestClick: (Int) -> Unit,
     viewModel: RepositoryActivityViewModel = hiltViewModel()
 ) {
+
     val state by viewModel.pullRequests.collectAsState()
 
     LaunchedEffect(owner, repo) {
@@ -67,6 +69,7 @@ fun PullRequestsScreen(
         Box(
             modifier = Modifier.weight(1f)
         ) {
+
             RepositoryActivityScreen(
                 state = state,
                 onRetry = {
@@ -75,9 +78,13 @@ fun PullRequestsScreen(
                 onLoadMore = {
                     viewModel.loadPullRequests(owner, repo)
                 },
-                itemKey = { it.id }
+                itemKey = { it.id },
+                onItemClick = { pull ->
+                    onPullRequestClick(pull.number)
+                }
             ) { pull ->
-                Text("#${pull.number} ${pull.title}")
+
+            Text("#${pull.number} ${pull.title}")
 
 
                 val status = when {

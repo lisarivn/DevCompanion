@@ -51,6 +51,23 @@ sealed class AppDestination(
         "Commits"
     )
 
+
+
+    data object PullRequestDetails : AppDestination(
+        "repository/{owner}/{repo}/pulls/{pullNumber}",
+        "Pull Request Details"
+    ) {
+        fun createRoute(
+            owner: String,
+            repo: String,
+            pullNumber: Int
+        ): String {
+            return "repository/${Uri.encode(owner)}/${Uri.encode(repo)}/pulls/$pullNumber"
+        }
+    }
+
+
+
     data object JsonFormatter : AppDestination(
         route = "devtools/json",
         title = "JSON Formatter"

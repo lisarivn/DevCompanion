@@ -37,6 +37,7 @@ data class GitHubLabelDto(
 
 class GitHubPullRequestReferenceDto
 
+
 data class GitHubPullRequestDto(
     val id: Long,
     val number: Int,
@@ -51,7 +52,18 @@ data class GitHubPullRequestDto(
     val mergedAt: String?,
 
     val head: GitHubBranchDto,
-    val base: GitHubBranchDto
+    val base: GitHubBranchDto,
+
+    val body: String? = null,
+
+    @SerializedName("updated_at")
+    val updatedAt: String? = null,
+
+    @SerializedName("closed_at")
+    val closedAt: String? = null,
+
+    @SerializedName("html_url")
+    val htmlUrl: String? = null
 )
 
 data class GitHubBranchDto(

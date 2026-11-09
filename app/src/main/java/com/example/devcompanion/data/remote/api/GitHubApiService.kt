@@ -54,6 +54,13 @@ interface GitHubApiService {
         @Query("page") page: Int = 1
     ): Response<List<GitHubPullRequestDto>>
 
+    @GET("repos/{owner}/{repo}/pulls/{pull_number}")
+    suspend fun getPullRequestDetails(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("pull_number") pullNumber: Int
+    ): GitHubPullRequestDto
+
     @GET("repos/{owner}/{repo}/commits")
     suspend fun getCommits(
         @Path("owner") owner: String,

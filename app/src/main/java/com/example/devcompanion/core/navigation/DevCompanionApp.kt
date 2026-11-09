@@ -43,6 +43,7 @@ import com.example.devcompanion.feature.devtools.regex.RegexCheckerScreen
 import com.example.devcompanion.feature.devtools.http.HttpClientScreen
 import com.example.devcompanion.feature.profile.ProfileScreen
 import com.example.devcompanion.feature.issues.IssueDetailsScreen
+import com.example.devcompanion.feature.pullrequests.PullRequestDetailsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +73,7 @@ fun DevCompanionApp() {
         AppDestination.RepositoryDetails.route -> "Repository Details"
         AppDestination.Issues.route -> "Issues"
         AppDestination.PullRequests.route -> "Pull Requests"
+        AppDestination.PullRequestDetails.route -> "Pull Request Details"
         AppDestination.Commits.route -> "Commits"
         AppDestination.UuidGenerator.route -> "UUID Generator"
         AppDestination.Timestamp.route -> "Timestamp Converter"
@@ -287,8 +289,47 @@ fun DevCompanionApp() {
                 val owner = entry.arguments?.getString("owner").orEmpty()
                 val repo = entry.arguments?.getString("repo").orEmpty()
 
-                PullRequestsScreen(owner = owner, repo = repo)
+                PullRequestsScreen(
+                    owner = owner,
+                    repo = repo,
+                    onPullRequestClick = { pullNumber ->
+                        navController.navigate(
+                            AppDestination.PullRequestDetails.createRoute(
+                                owner = owner,
+                                repo = repo,
+                                pullNumber = pullNumber
+                            )
+                        )
+                    }
+                )
             }
+
+
+            composable(
+                route = AppDestination.PullRequestDetails.route,
+                arguments = listOf(
+                    navArgument("owner") {
+                        type = NavType.StringType
+                    },
+                    navArgument("repo") {
+                        type = NavType.StringType
+                    },
+                    navArgument("pullNumber") {
+                        type = NavType.IntType
+                    }
+                )
+            ) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+                val pullNumber = entry.arguments?.getInt("pullNumber") ?: 0
+
+                PullRequestDetailsScreen(
+                    owner = owner,
+                    repo = repo,
+                    pullNumber = pullNumber
+                )
+            }
+
 
             // Commits
             composable(AppDestination.Commits.route) { entry ->

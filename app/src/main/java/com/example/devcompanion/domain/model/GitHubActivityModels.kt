@@ -14,6 +14,7 @@ data class GitHubIssue(
     val htmlUrl: String? = null
 )
 
+
 data class GitHubPullRequest(
     val id: Long,
     val number: Int,
@@ -23,7 +24,12 @@ data class GitHubPullRequest(
     val createdAt: String,
     val isMerged: Boolean,
     val headBranch: String,
-    val baseBranch: String
+    val baseBranch: String,
+    val body: String? = null,
+    val updatedAt: String? = null,
+    val mergedAt: String? = null,
+    val closedAt: String? = null,
+    val htmlUrl: String? = null
 )
 
 data class GitHubCommit(

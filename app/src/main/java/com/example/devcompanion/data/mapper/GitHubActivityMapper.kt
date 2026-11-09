@@ -30,7 +30,12 @@ fun GitHubPullRequestDto.toDomain() = GitHubPullRequest(
     createdAt = createdAt,
     isMerged = mergedAt != null,
     headBranch = head.ref,
-    baseBranch = base.ref
+    baseBranch = base.ref,
+    body = body,
+    updatedAt = updatedAt,
+    mergedAt = mergedAt,
+    closedAt = closedAt,
+    htmlUrl = htmlUrl
 )
 
 fun GitHubCommitDto.toDomain() = GitHubCommit(

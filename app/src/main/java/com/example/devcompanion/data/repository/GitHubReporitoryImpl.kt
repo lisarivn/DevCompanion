@@ -129,6 +129,18 @@ class GitHubRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getPullRequestDetails(
+        owner: String,
+        repo: String,
+        pullNumber: Int
+    ): GitHubPullRequest {
+        return apiService.getPullRequestDetails(
+            owner = owner,
+            repo = repo,
+            pullNumber = pullNumber
+        ).toDomain()
+    }
+
 
     override suspend fun getCommits(
         owner: String,

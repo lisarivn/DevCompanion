@@ -44,6 +44,12 @@ interface GitHubRepositoryDataSource {
         state: String = "all"
     ): PageResult<GitHubPullRequest>
 
+    suspend fun getPullRequestDetails(
+        owner: String,
+        repo: String,
+        pullNumber: Int
+    ): GitHubPullRequest
+
     suspend fun getCommits(
         owner: String,
         repo: String,
