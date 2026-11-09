@@ -40,7 +40,8 @@ interface GitHubRepositoryDataSource {
     suspend fun getPullRequests(
         owner: String,
         repo: String,
-        page: Int = 1
+        page: Int = 1,
+        state: String = "all"
     ): PageResult<GitHubPullRequest>
 
     suspend fun getCommits(

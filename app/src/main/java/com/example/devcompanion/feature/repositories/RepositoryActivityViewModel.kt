@@ -25,7 +25,8 @@ data class ActivityUiState<T>(
     val error: String? = null,
     val repositoryKey: String? = null,
     val hasLoaded: Boolean = false,
-    val issueFilter: String = "all"
+    val issueFilter: String = "all",
+    val pullRequestFilter: String = "all"
 )
 
 @HiltViewModel
@@ -186,6 +187,32 @@ class RepositoryActivityViewModel @Inject constructor(
         loadIssues(owner, repo)
     }
 
+
+    fun updatePullRequestsFilter(
+        owner: String,
+        repo: String,
+        filter: String
+    ) {
+        if (filter !in listOf("open", "closed", "all")) return
+
+        val key = repositoryKey(owner, repo)
+
+        if (_pullRequests.value.repositoryKey == key &&
+            _pullRequests.value.pullRequestFilter == filter
+        ) return
+
+        pullsJob?.cancel()
+        pullsJob = null
+
+        _pullRequests.value = ActivityUiState(
+            repositoryKey = key,
+            pullRequestFilter = filter
+        )
+
+        loadPullRequests(owner, repo)
+    }
+
+
     fun initializeIssues(owner: String, repo: String) {
         prepareState(
             state = _issues,
@@ -259,12 +286,19 @@ class RepositoryActivityViewModel @Inject constructor(
     }
 
     fun loadPullRequests(owner: String, repo: String) {
+        val filter = _pullRequests.value.pullRequestFilter
+
         loadPage(
             state = _pullRequests,
             owner = owner,
             repo = repo,
             loader = { page ->
-                repository.getPullRequests(owner, repo, page)
+                repository.getPullRequests(
+                    owner = owner,
+                    repo = repo,
+                    page = page,
+                    state = filter
+                )
             },
             itemId = { it.id },
             setJob = { pullsJob = it }

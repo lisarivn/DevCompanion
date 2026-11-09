@@ -112,19 +112,23 @@ class GitHubRepositoryImpl @Inject constructor(
         ).toDomain()
     }
 
+
     override suspend fun getPullRequests(
         owner: String,
         repo: String,
-        page: Int
+        page: Int,
+        state: String
     ): PageResult<GitHubPullRequest> {
         return apiService.getPullRequests(
             owner = owner,
             repo = repo,
+            state = state,
             page = page
         ).toPageResult { pulls ->
             pulls.map { it.toDomain() }
         }
     }
+
 
     override suspend fun getCommits(
         owner: String,
