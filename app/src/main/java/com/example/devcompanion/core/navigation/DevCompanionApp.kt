@@ -44,6 +44,7 @@ import com.example.devcompanion.feature.devtools.http.HttpClientScreen
 import com.example.devcompanion.feature.profile.ProfileScreen
 import com.example.devcompanion.feature.issues.IssueDetailsScreen
 import com.example.devcompanion.feature.pullrequests.PullRequestDetailsScreen
+import com.example.devcompanion.feature.commits.CommitDetailsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,12 +76,14 @@ fun DevCompanionApp() {
         AppDestination.PullRequests.route -> "Pull Requests"
         AppDestination.PullRequestDetails.route -> "Pull Request Details"
         AppDestination.Commits.route -> "Commits"
+        AppDestination.CommitDetails.route -> "Commit Details"
         AppDestination.UuidGenerator.route -> "UUID Generator"
         AppDestination.Timestamp.route -> "Timestamp Converter"
         AppDestination.RegexChecker.route -> "Regex Checker"
         AppDestination.HttpClient.route -> "HTTP Client"
         AppDestination.Profile.route -> "GitHub Profile"
         AppDestination.IssueDetails.route -> "Issue Details"
+
         else -> "DevCompanion"
     }
 
@@ -332,11 +335,51 @@ fun DevCompanionApp() {
 
 
             // Commits
+
+// Commits
             composable(AppDestination.Commits.route) { entry ->
                 val owner = entry.arguments?.getString("owner").orEmpty()
                 val repo = entry.arguments?.getString("repo").orEmpty()
 
-                CommitsScreen(owner = owner, repo = repo)
+                CommitsScreen(
+                    owner = owner,
+                    repo = repo,
+                    onCommitClick = { sha ->
+                        navController.navigate(
+                            AppDestination.CommitDetails.createRoute(
+                                owner = owner,
+                                repo = repo,
+                                sha = sha
+                            )
+                        )
+                    }
+                )
+            }
+
+// Commit Details
+            composable(
+                route = AppDestination.CommitDetails.route,
+                arguments = listOf(
+                    navArgument("owner") {
+                        type = NavType.StringType
+                    },
+                    navArgument("repo") {
+                        type = NavType.StringType
+                    },
+                    navArgument("sha") {
+                        type = NavType.StringType
+                    }
+                )
+            ) { entry ->
+                val owner = entry.arguments?.getString("owner").orEmpty()
+                val repo = entry.arguments?.getString("repo").orEmpty()
+                val sha = entry.arguments?.getString("sha").orEmpty()
+
+                CommitDetailsScreen(
+                    owner = owner,
+                    repo = repo,
+                    sha = sha
+                )
             }
 
             // DevTools

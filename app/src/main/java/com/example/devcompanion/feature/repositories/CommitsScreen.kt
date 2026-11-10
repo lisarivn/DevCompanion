@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun CommitsScreen(
     owner: String,
     repo: String,
+    onCommitClick: (String) -> Unit,
     viewModel: RepositoryActivityViewModel = hiltViewModel()
 ) {
     val state by viewModel.commits.collectAsState()
@@ -103,6 +104,7 @@ fun CommitsScreen(
         Box(
             modifier = Modifier.weight(1f)
         ) {
+
             RepositoryActivityScreen(
                 state = state,
                 onRetry = {
@@ -111,7 +113,10 @@ fun CommitsScreen(
                 onLoadMore = {
                     viewModel.loadCommits(owner, repo)
                 },
-                itemKey = { it.sha }
+                itemKey = { it.sha },
+                onItemClick = { commit ->
+                    onCommitClick(commit.sha)
+                }
             ) { commit ->
                 Text(
                     commit.message
@@ -119,6 +124,7 @@ fun CommitsScreen(
                         .firstOrNull()
                         .orEmpty()
                 )
+
                 Text("SHA: ${commit.sha.take(7)}")
                 Text("Author: ${commit.author}")
                 Text("Date: ${commit.date}")

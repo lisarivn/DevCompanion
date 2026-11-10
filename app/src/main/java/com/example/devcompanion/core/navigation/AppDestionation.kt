@@ -51,7 +51,18 @@ sealed class AppDestination(
         "Commits"
     )
 
-
+    data object CommitDetails : AppDestination(
+        "repository/{owner}/{repo}/commits/{sha}",
+        "Commit Details"
+    ) {
+        fun createRoute(
+            owner: String,
+            repo: String,
+            sha: String
+        ): String {
+            return "repository/${Uri.encode(owner)}/${Uri.encode(repo)}/commits/${Uri.encode(sha)}"
+        }
+    }
 
     data object PullRequestDetails : AppDestination(
         "repository/{owner}/{repo}/pulls/{pullNumber}",
