@@ -6,6 +6,8 @@ import com.example.devcompanion.data.remote.dto.GitHubPullRequestDto
 import com.example.devcompanion.domain.model.GitHubCommit
 import com.example.devcompanion.domain.model.GitHubIssue
 import com.example.devcompanion.domain.model.GitHubPullRequest
+import com.example.devcompanion.domain.model.GitHubCommitStats
+import com.example.devcompanion.domain.model.GitHubCommitFile
 
 fun GitHubIssueDto.toDomain() = GitHubIssue(
     id = id,
@@ -38,9 +40,29 @@ fun GitHubPullRequestDto.toDomain() = GitHubPullRequest(
     htmlUrl = htmlUrl
 )
 
+
 fun GitHubCommitDto.toDomain() = GitHubCommit(
     sha = sha,
     message = commit.message,
     author = commit.author?.name ?: "Unknown",
-    date = commit.author?.date.orEmpty()
+    date = commit.author?.date.orEmpty(),
+    htmlUrl = htmlUrl,
+
+    stats = stats?.let {
+        GitHubCommitStats(
+            additions = it.additions,
+            deletions = it.deletions,
+            total = it.total
+        )
+    },
+
+    files = files.orEmpty().map {
+        GitHubCommitFile(
+            filename = it.filename,
+            status = it.status,
+            additions = it.additions,
+            deletions = it.deletions,
+            changes = it.changes
+        )
+    }
 )

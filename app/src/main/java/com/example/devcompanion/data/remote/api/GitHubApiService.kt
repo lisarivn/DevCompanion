@@ -71,6 +71,13 @@ interface GitHubApiService {
         @Query("page") page: Int = 1
     ): Response<List<GitHubCommitDto>>
 
+    @GET("repos/{owner}/{repo}/commits/{ref}")
+    suspend fun getCommitDetails(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("ref") sha: String
+    ): GitHubCommitDto
+
     @GET("repos/{owner}/{repo}/branches")
     suspend fun getBranches(
         @Path("owner") owner: String,

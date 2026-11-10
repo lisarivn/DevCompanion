@@ -58,6 +58,13 @@ interface GitHubRepositoryDataSource {
         branch: String? = null
     ): PageResult<GitHubCommit>
 
+    suspend fun getCommitDetails(
+        owner: String,
+        repo: String,
+        sha: String
+    ): GitHubCommit
+
+
     suspend fun getBranches(
         owner: String,
         repo: String

@@ -159,6 +159,19 @@ class GitHubRepositoryImpl @Inject constructor(
     }
 
 
+    override suspend fun getCommitDetails(
+        owner: String,
+        repo: String,
+        sha: String
+    ): GitHubCommit {
+        return apiService.getCommitDetails(
+            owner = owner,
+            repo = repo,
+            sha = sha
+        ).toDomain()
+    }
+
+
     override suspend fun getBranches(
         owner: String,
         repo: String

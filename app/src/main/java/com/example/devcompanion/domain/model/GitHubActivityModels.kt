@@ -36,5 +36,8 @@ data class GitHubCommit(
     val sha: String,
     val message: String,
     val author: String,
-    val date: String
+    val date: String,
+    val htmlUrl: String? = null,
+    val stats: GitHubCommitStats? = null,
+    val files: List<GitHubCommitFile> = emptyList()
 )

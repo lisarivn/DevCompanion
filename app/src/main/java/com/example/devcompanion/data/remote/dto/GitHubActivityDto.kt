@@ -70,9 +70,24 @@ data class GitHubBranchDto(
     val ref: String
 )
 
-data class GitHubCommitDto(
-    val sha: String,
-    val commit: GitHubCommitInfoDto
+
+data class GitHubCommitStatsDto(
+    val additions: Int,
+    val deletions: Int,
+    val total: Int
+)
+
+data class GitHubCommitFileDto(
+    val filename: String,
+    val status: String,
+    val additions: Int,
+    val deletions: Int,
+    val changes: Int
+)
+
+data class GitHubCommitAuthorDto(
+    val name: String?,
+    val date: String?
 )
 
 data class GitHubCommitInfoDto(
@@ -80,7 +95,14 @@ data class GitHubCommitInfoDto(
     val author: GitHubCommitAuthorDto?
 )
 
-data class GitHubCommitAuthorDto(
-    val name: String?,
-    val date: String?
+data class GitHubCommitDto(
+    val sha: String,
+    val commit: GitHubCommitInfoDto,
+
+    @SerializedName("html_url")
+    val htmlUrl: String? = null,
+
+    val stats: GitHubCommitStatsDto? = null,
+
+    val files: List<GitHubCommitFileDto>? = null
 )
