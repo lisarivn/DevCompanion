@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import com.example.devcompanion.domain.model.GitHubBranch
 
 data class ActivityUiState<T>(
     val items: List<T> = emptyList(),
@@ -27,6 +28,14 @@ data class ActivityUiState<T>(
     val hasLoaded: Boolean = false,
     val issueFilter: String = "all",
     val pullRequestFilter: String = "all"
+)
+
+data class BranchesUiState(
+    val branches: List<GitHubBranch> = emptyList(),
+    val selectedBranch: String? = null,
+    val repositoryKey: String? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
 )
 
 @HiltViewModel
@@ -45,6 +54,11 @@ class RepositoryActivityViewModel @Inject constructor(
     private val _commits =
         MutableStateFlow(ActivityUiState<GitHubCommit>())
     val commits = _commits.asStateFlow()
+
+    private val _branches = MutableStateFlow(BranchesUiState())
+    val branches = _branches.asStateFlow()
+
+    private var branchesJob: Job? = null
 
     private var issuesJob: Job? = null
     private var pullsJob: Job? = null
@@ -322,16 +336,94 @@ class RepositoryActivityViewModel @Inject constructor(
         }
     }
 
+
     fun loadCommits(owner: String, repo: String) {
+        val branch = _branches.value
+            .takeIf { it.repositoryKey == repositoryKey(owner, repo) }
+            ?.selectedBranch
+
         loadPage(
             state = _commits,
             owner = owner,
             repo = repo,
             loader = { page ->
-                repository.getCommits(owner, repo, page)
+                repository.getCommits(
+                    owner = owner,
+                    repo = repo,
+                    page = page,
+                    branch = branch
+                )
             },
             itemId = { it.sha },
             setJob = { commitsJob = it }
         )
     }
+
+    fun initializeBranches(owner: String, repo: String) {
+        val key = repositoryKey(owner, repo)
+
+        if (_branches.value.repositoryKey == key) {
+            return
+        }
+
+        branchesJob?.cancel()
+
+        _branches.value = BranchesUiState(
+            repositoryKey = key,
+            isLoading = true
+        )
+
+        branchesJob = viewModelScope.launch {
+            try {
+                val result = repository.getBranches(owner, repo)
+
+                if (_branches.value.repositoryKey != key) {
+                    return@launch
+                }
+
+                _branches.value = _branches.value.copy(
+                    branches = result,
+                    isLoading = false,
+                    error = null
+                )
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (exception: Exception) {
+                if (_branches.value.repositoryKey == key) {
+                    _branches.value = _branches.value.copy(
+                        isLoading = false,
+                        error = errorMessage(exception)
+                    )
+                }
+            }
+        }
+    }
+
+    fun selectBranch(
+        owner: String,
+        repo: String,
+        branch: String
+    ) {
+        val key = repositoryKey(owner, repo)
+
+        if (_branches.value.repositoryKey != key) return
+
+        if (_branches.value.selectedBranch == branch) return
+
+        if (_branches.value.branches.none { it.name == branch }) return
+
+        commitsJob?.cancel()
+        commitsJob = null
+
+        _branches.value = _branches.value.copy(
+            selectedBranch = branch
+        )
+
+        _commits.value = ActivityUiState(
+            repositoryKey = key
+        )
+
+        loadCommits(owner, repo)
+    }
+
 }

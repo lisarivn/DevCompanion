@@ -8,6 +8,7 @@ import com.example.devcompanion.domain.model.GitHubRepositoryDetails
 import com.example.devcompanion.domain.model.PageResult
 import com.example.devcompanion.domain.model.GitHubUser
 import com.example.devcompanion.domain.model.GitHubEvent
+import com.example.devcompanion.domain.model.GitHubBranch
 
 interface GitHubRepositoryDataSource {
 
@@ -53,8 +54,14 @@ interface GitHubRepositoryDataSource {
     suspend fun getCommits(
         owner: String,
         repo: String,
-        page: Int = 1
+        page: Int = 1,
+        branch: String? = null
     ): PageResult<GitHubCommit>
+
+    suspend fun getBranches(
+        owner: String,
+        repo: String
+    ): List<GitHubBranch>
 
     suspend fun getUserProfile(
         username: String): GitHubUser

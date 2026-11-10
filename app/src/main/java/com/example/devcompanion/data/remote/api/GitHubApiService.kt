@@ -8,6 +8,7 @@ import com.example.devcompanion.data.remote.dto.RepositorySearchResponseDto
 import com.example.devcompanion.data.remote.dto.GitHubUserDto
 import com.example.devcompanion.data.remote.dto.GitHubEventDto
 import com.example.devcompanion.data.remote.dto.GitHubRepositoryDto
+import com.example.devcompanion.data.remote.dto.GitHubBranchResponseDto
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -65,9 +66,18 @@ interface GitHubApiService {
     suspend fun getCommits(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
+        @Query("sha") branch: String? = null,
         @Query("per_page") perPage: Int = 30,
         @Query("page") page: Int = 1
     ): Response<List<GitHubCommitDto>>
+
+    @GET("repos/{owner}/{repo}/branches")
+    suspend fun getBranches(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Query("per_page") perPage: Int = 100,
+        @Query("page") page: Int = 1
+    ): Response<List<GitHubBranchResponseDto>>
 
     @GET("users/{username}")
     suspend fun getUserProfile(

@@ -14,6 +14,7 @@ import com.example.devcompanion.data.remote.toPageResult
 import com.example.devcompanion.domain.model.GitHubUser
 import com.example.devcompanion.data.auth.TokenStorage
 import com.example.devcompanion.domain.model.GitHubEvent
+import com.example.devcompanion.domain.model.GitHubBranch
 
 class GitHubRepositoryImpl @Inject constructor(
     private val apiService: GitHubApiService,
@@ -141,20 +142,43 @@ class GitHubRepositoryImpl @Inject constructor(
         ).toDomain()
     }
 
-
     override suspend fun getCommits(
         owner: String,
         repo: String,
-        page: Int
+        page: Int,
+        branch: String?
     ): PageResult<GitHubCommit> {
         return apiService.getCommits(
             owner = owner,
             repo = repo,
+            branch = branch,
             page = page
         ).toPageResult { commits ->
             commits.map { it.toDomain() }
         }
     }
+
+
+    override suspend fun getBranches(
+        owner: String,
+        repo: String
+    ): List<GitHubBranch> {
+        val response = apiService.getBranches(
+            owner = owner,
+            repo = repo
+        )
+
+        if (!response.isSuccessful) {
+            throw retrofit2.HttpException(response)
+        }
+
+        return response.body()
+            .orEmpty()
+            .map { branch ->
+                GitHubBranch(name = branch.name)
+            }
+    }
+
 
     override suspend fun getUserProfile(username: String): GitHubUser {
         return apiService.getUserProfile(username).toDomain()
