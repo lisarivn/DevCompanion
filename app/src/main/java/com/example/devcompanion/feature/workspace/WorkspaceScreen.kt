@@ -28,10 +28,14 @@ import coil.compose.AsyncImage
 import com.example.devcompanion.feature.auth.AuthContent
 import com.example.devcompanion.feature.auth.AuthViewModel
 import com.example.devcompanion.feature.profile.ProfileViewModel
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
+import com.example.devcompanion.core.ui.theme.AppTheme
 
 @Composable
 fun WorkspaceScreen(
-    onAppearanceClick: () -> Unit,
+    selectedTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit,
     onAboutClick: () -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel()
@@ -151,13 +155,51 @@ fun WorkspaceScreen(
             }
         }
 
+
         item {
-            WorkspaceItem(
-                title = "Appearance",
-                description = "Light, Dark and System theme",
-                onClick = onAppearanceClick
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "Appearance",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    Text(
+                        text = "Choose your preferred theme.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    AppTheme.entries.forEach { theme ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            RadioButton(
+                                selected = selectedTheme == theme,
+                                onClick = {
+                                    onThemeChange(theme)
+                                }
+                            )
+
+                            Text(
+                                text = when (theme) {
+                                    AppTheme.SYSTEM -> "System default"
+                                    AppTheme.LIGHT -> "Light"
+                                    AppTheme.DARK -> "Dark"
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
+
 
         item {
             WorkspaceItem(

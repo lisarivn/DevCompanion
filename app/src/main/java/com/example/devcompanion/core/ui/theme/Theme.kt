@@ -6,15 +6,26 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
-private val LightColors = lightColorScheme()
+enum class AppTheme {
+    SYSTEM,
+    LIGHT,
+    DARK
+}
 
+private val LightColors = lightColorScheme()
 private val DarkColors = darkColorScheme()
 
 @Composable
 fun DevCompanionTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    appTheme: AppTheme = AppTheme.SYSTEM,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (appTheme) {
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+        AppTheme.LIGHT -> false
+        AppTheme.DARK -> true
+    }
+
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColors else LightColors,
         content = content

@@ -45,10 +45,14 @@ import com.example.devcompanion.feature.profile.ProfileScreen
 import com.example.devcompanion.feature.issues.IssueDetailsScreen
 import com.example.devcompanion.feature.pullrequests.PullRequestDetailsScreen
 import com.example.devcompanion.feature.commits.CommitDetailsScreen
+import com.example.devcompanion.core.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DevCompanionApp() {
+fun DevCompanionApp(
+    selectedTheme: AppTheme,
+    onThemeChange: (AppTheme) -> Unit
+) {
 
     val navController = rememberNavController()
 
@@ -437,9 +441,8 @@ fun DevCompanionApp() {
 
             composable(AppDestination.Workspace.route) {
                 WorkspaceScreen(
-                    onAppearanceClick = {
-                        // WS-02
-                    },
+                    selectedTheme = selectedTheme,
+                    onThemeChange = onThemeChange,
                     onAboutClick = {
                         // WS-03
                     }
