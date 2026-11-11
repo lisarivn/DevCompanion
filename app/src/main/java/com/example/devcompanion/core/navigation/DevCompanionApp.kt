@@ -392,6 +392,7 @@ fun DevCompanionApp() {
                                     AppDestination.JsonFormatter.route
                                 )
                             }
+
                             "uuid" -> navController.navigate(
                                 AppDestination.UuidGenerator.route
                             )
@@ -403,6 +404,7 @@ fun DevCompanionApp() {
                             "regex" -> navController.navigate(
                                 AppDestination.RegexChecker.route
                             )
+
                             "http" -> navController.navigate(
                                 AppDestination.HttpClient.route
                             )
@@ -432,9 +434,18 @@ fun DevCompanionApp() {
             }
 
             // Workspace
+
             composable(AppDestination.Workspace.route) {
-                WorkspaceScreen()
+                WorkspaceScreen(
+                    onAppearanceClick = {
+                        // WS-02
+                    },
+                    onAboutClick = {
+                        // WS-03
+                    }
+                )
             }
+
         }
     }
 }
