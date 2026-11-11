@@ -29,14 +29,12 @@ import com.example.devcompanion.feature.auth.AuthContent
 import com.example.devcompanion.feature.auth.AuthViewModel
 import com.example.devcompanion.feature.profile.ProfileViewModel
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Surface
 import com.example.devcompanion.core.ui.theme.AppTheme
 
 @Composable
 fun WorkspaceScreen(
     selectedTheme: AppTheme,
     onThemeChange: (AppTheme) -> Unit,
-    onAboutClick: () -> Unit,
     authViewModel: AuthViewModel = hiltViewModel(),
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -202,42 +200,89 @@ fun WorkspaceScreen(
 
 
         item {
-            WorkspaceItem(
-                title = "About DevCompanion",
-                description = "Application information",
-                onClick = onAboutClick
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "About DevCompanion",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Version 1.0",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    HorizontalDivider()
+
+                    Text(
+                        text = "DevCompanion is an Android application " +
+                                "that combines GitHub integration, " +
+                                "repository management, developer tools, " +
+                                "and personal workspace settings.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    HorizontalDivider()
+
+                    Text(
+                        text = "Technologies",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Text(
+                        text = "Kotlin • Jetpack Compose • Material 3 • " +
+                                "Hilt • Retrofit • OkHttp • Room • " +
+                                "Coroutines • GitHub REST API"
+                    )
+
+                    HorizontalDivider()
+
+                    Text(
+                        text = "Project: Mobile Development, RGR",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
     }
 }
 
-@Composable
-private fun WorkspaceItem(
-    title: String,
-    description: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+        @Composable
+        private fun WorkspaceItem(
+            title: String,
+            description: String,
+            onClick: () -> Unit
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium
-            )
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onClick
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
-    }
-}
 
 @Composable
 private fun ProfileStatistic(

@@ -438,17 +438,12 @@ fun DevCompanionApp(
             }
 
             // Workspace
-
             composable(AppDestination.Workspace.route) {
                 WorkspaceScreen(
                     selectedTheme = selectedTheme,
-                    onThemeChange = onThemeChange,
-                    onAboutClick = {
-                        // WS-03
-                    }
+                    onThemeChange = onThemeChange
                 )
             }
-
         }
     }
 }
